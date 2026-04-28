@@ -20,5 +20,5 @@ app.register_blueprint(exercises_bp, url_preefix="/api/exercises")
 
 
 
-if __name__ == __main__:
+if __name__ == "__main__":
     app.run(debug=True)
