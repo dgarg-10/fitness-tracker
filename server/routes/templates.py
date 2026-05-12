@@ -50,7 +50,7 @@ def update_template(template_id):
         }).execute()
     return jsonify({'success': True})
 
-@templates_bp.route('/<template_id>', methods=["DELETE"])
+@templates_bp.route('/<template_id>', methods=["DELETE"])   
 @require_auth
 def delete_template(template_id):
     user_id = request.user_id
