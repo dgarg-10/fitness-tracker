@@ -44,7 +44,7 @@ def create_workout():
                 "duration_meters": s.get("distance_meters") or None,
                 "pace": s.get("pace") or None 
             }).execute()
-        _update_prs(user_id, body.get('exercises', []))
+        _update_prs(user_id, data.get('exercises', []))
         return jsonify(workout.data[0]), 201
     
 @exercises_bp.route('/<workout_id>', methods=["PUT"])
@@ -112,4 +112,3 @@ def _update_prs(user_id, exercises):
                 'weight': float(best.get('weight', 0)),
                 'reps': int(best.get('reps', 0))
             }).execute()
-            
