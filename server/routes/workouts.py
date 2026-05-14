@@ -2,9 +2,9 @@ from flask import Blueprint, request, jsonify
 from db import supabase
 from middleware.auth import require_auth
 
-exercises_bp = Blueprint('workouts', __name__)
+workouts_bp = Blueprint('workouts', __name__)
 
-@exercises_bp.route('/', methods=['GET'])
+@workouts_bp.route('/', methods=['GET'])
 @require_auth
 def get_workout():
     user_id = request.user_id
@@ -13,7 +13,7 @@ def get_workout():
     ).eq('user_id', user_id).order('date', desc=True).execute()
     return jsonify(result.data)
 
-@exercises_bp.route('/', methods=["POST"])
+@workouts_bp.route('/', methods=["POST"])
 @require_auth
 def create_workout():
     user_id = request.user_id
@@ -47,7 +47,7 @@ def create_workout():
         _update_prs(user_id, data.get('exercises', []))
         return jsonify(workout.data[0]), 201
     
-@exercises_bp.route('/<workout_id>', methods=["PUT"])
+@workouts_bp.route('/<workout_id>', methods=["PUT"])
 @require_auth
 def update_workout(workout_id):
     user_id = request.user_id
@@ -80,7 +80,7 @@ def update_workout(workout_id):
     _update_prs(user_id, body.get('exercises', []))
     return jsonify({'success': True})
 
-@exercises_bp.route('/<workout_id>', methods=["DELETE"])
+@workouts_bp.route('/<workout_id>', methods=["DELETE"])
 @require_auth
 def delete_exercise(workout_id):
     user_id = request.user_id

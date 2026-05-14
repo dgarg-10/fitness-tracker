@@ -4,7 +4,7 @@ from db import supabase
 
 planner_bp = Blueprint('planner', __name__)
 
-@planner_bp.routes('/', methods=["GET"])
+@planner_bp.route('/', methods=["GET"])
 @require_auth
 def get_planner():
     user_id = request.user_id
@@ -13,7 +13,7 @@ def get_planner():
     ).eq('user_id', user_id).execute()
     return jsonify(result.data)
 
-@planner_bp.execute('/', methods=["POST"])
+@planner_bp.route('/', methods=["POST"])
 @require_auth
 def create_planner():
     user_id = request.user_id
@@ -27,7 +27,7 @@ def create_planner():
     }).execute()
     return jsonify(result.data[0]), 201
 
-@planner_bp.execute('/<weekly_plan_id>', methods=["DELETE"])
+@planner_bp.route('/<weekly_plan_id>', methods=["DELETE"])
 @require_auth
 def delete_planner(weekly_plan_id):
     user_id = request.user_id
