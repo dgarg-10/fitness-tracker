@@ -2,6 +2,8 @@ import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { supabase } from '../services/supabase'
 import type { AuthError } from '@supabase/supabase-js'
+import { useNavigate } from 'react-router-dom'
+
 
 export default function Auth(){
     const[email, setEmail] = useState<string>('')
@@ -9,16 +11,22 @@ export default function Auth(){
     const[isLogin, setIsLogin] = useState<boolean>(true)
     const[error, setError] = useState<string | null>(null)
     const[loading, setLoading] = useState<boolean>(false)
+    const navigate = useNavigate()
 
     const handleSubmit = async (): Promise<void> => {
         setError(null)
-        setLoading(false)
+        setLoading(true)
 
         const {error: authError}: {error: AuthError | null} =  isLogin 
         ? await supabase.auth.signInWithPassword({email, password})
         : await supabase.auth.signUp({email, password})
 
-        if(authError) setError(authError.message)
+        if(authError) {
+          setError(authError.message)
+        } else {
+          navigate('/')
+        }
+        
         setLoading(false)
     }
     return (
