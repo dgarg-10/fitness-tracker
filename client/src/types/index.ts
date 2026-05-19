@@ -47,7 +47,7 @@ export interface Workout {
     name: string
     date: string
     notes: string | null
-    reated_from_template_id: string | null
+    created_from_template_id: string | null
     created_at: string
     workout_exercises: WorkoutExercise[]
 }
