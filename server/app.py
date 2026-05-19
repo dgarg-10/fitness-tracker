@@ -7,18 +7,19 @@ from routes.planner import planner_bp
 from routes.exercises import exercises_bp
 
 app = Flask(__name__)
-CORS(app, origins="http://localhost:5173")
+
+CORS(app, 
+     resources={r"/api/*": {"origins": "http://localhost:5173"}},
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     supports_credentials=True
+)
 
 app.register_blueprint(workouts_bp, url_prefix="/api/workouts")
 app.register_blueprint(templates_bp, url_prefix="/api/templates")
 app.register_blueprint(progress_bp, url_prefix="/api/progress")
 app.register_blueprint(planner_bp, url_prefix="/api/planner")
-app.register_blueprint(exercises_bp, url_preefix="/api/exercises")
-
-
-
-
-
+app.register_blueprint(exercises_bp, url_prefix="/api/exercises")
 
 if __name__ == "__main__":
     app.run(debug=True)

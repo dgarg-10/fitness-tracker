@@ -5,6 +5,10 @@ from db import supabase
 def require_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        # Let preflight OPTIONS requests pass through without auth check
+        if request.method == 'OPTIONS':
+            return f(*args, **kwargs)
+        
         auth_header = request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
             return jsonify({"error": "Unauthorized"}), 401
