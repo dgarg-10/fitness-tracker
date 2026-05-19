@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext"
-import styles from "./Navbar.module.css"
-
+import styles from './Navbar.module.css'
 interface NavLink {
     to: string,
     label: string
@@ -19,7 +18,7 @@ export default function NavBar(){
     const { signOut } = useAuth()
     const { pathname } = useLocation()
     return (
-    <nav className={styles.navbar}>
+    <nav className={styles.nav}>
         <span className={styles.logo}>My Workout Logger</span>
         <div className={styles.links}>
             {links.map((link) => (
