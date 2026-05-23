@@ -43,7 +43,7 @@ export default function Dashboard(){
     const handleDelete = async (id: string): Promise<void> => {
         if(!window.confirm("Delete this workout?")) 
             return;
-        await api.delete("/api/workouts/${id}")
+        await api.delete(`/api/workouts/${id}`)
         fetchWorkouts()
     }
     
