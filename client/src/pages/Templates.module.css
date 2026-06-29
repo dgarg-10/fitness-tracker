@@ -1,0 +1,192 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .button {
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  
+  .button:hover {
+    background: #2563eb;
+  }
+  
+  .templateCard {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.15s ease;
+  }
+  
+  .templateCard:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .templateHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  
+  .templateName {
+    font-weight: 600;
+    font-size: 15px;
+    color: #111827;
+  }
+  
+  .templateExercises {
+    font-size: 13px;
+    color: #6b7280;
+  }
+  
+  .templateActions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .actionButton {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  
+  .actionButton:hover {
+    background: #f3f4f6;
+  }
+  
+  .deleteButton {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #fee2e2;
+    background: #ffffff;
+    color: #ef4444;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  
+  .deleteButton:hover {
+    background: #fef2f2;
+  }
+  
+  .empty {
+    color: #9ca3af;
+    font-size: 14px;
+    text-align: center;
+    padding: 32px 0;
+  }
+  
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .modalTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 16px;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  
+  .input:focus {
+    border-color: #3b82f6;
+  }
+  
+  .exercisePickerTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  
+  .exerciseOption {
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #374151;
+    transition: background 0.15s ease;
+  }
+  
+  .exerciseOptionSelected {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  
+  .exerciseTag {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-left: 6px;
+  }
+  
+  .modalActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  
+  .cancelButton {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #374151;
+    font-size: 14px;
+    cursor: pointer;
+  }
