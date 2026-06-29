@@ -1,3 +1,4 @@
+
 export type MuscleGroup = 
 | 'chest'
 | 'back'
@@ -29,7 +30,7 @@ export interface WorkoutSet {
     is_bodyweight?: boolean
     duration_seconds?: number | null
     distance_meters?: number | null
-
+    pace?: string | null
 }
 
 export interface WorkoutExercise {
