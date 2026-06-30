@@ -6,7 +6,7 @@ templates_bp = Blueprint('templates', __name__)
 
 @templates_bp.route('/', methods=["GET"])
 @require_auth
-def get_template():
+def get_templates():
     user_id = request.user_id
     result = supabase.table('templates').select(
     '*, template_exercises(*, exercises(*))'
