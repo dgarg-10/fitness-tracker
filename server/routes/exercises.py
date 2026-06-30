@@ -9,7 +9,9 @@ exercises_bp = Blueprint('exercises', __name__)
 @require_auth
 def get_exercise():
     user_id = request.user_id
-    result = supabase.table('exercises').select('*').execute().or_(f'user_id.is.null,user_id.eq.{user_id}')
+    result = supabase.table('exercises').select('*').or_(
+    f'user_id.is.null,user_id.eq.{user_id}'
+    ).execute() 
     return jsonify(result.data)
 
 
