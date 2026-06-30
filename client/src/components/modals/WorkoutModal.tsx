@@ -7,21 +7,23 @@ import type {
   ModalExercise,
   ModalSet,
   MuscleGroup,
-  ExerciseType
+  ExerciseType,
+  Template
 } from '../../types'
 import styles from './WorkoutModal.module.css'
-
-interface WorkoutModalProps {
-  workout: Workout | null
-  onClose: () => void
-  onSave: () => void
-}
 
 interface NewExerciseForm {
   name: string
   muscle_group: MuscleGroup
   type: ExerciseType
 }
+
+interface WorkoutModalProps {
+    workout: Workout | null
+    template?: Template | null
+    onClose: () => void
+    onSave: () => void
+  }
 
 const MUSCLE_GROUPS: MuscleGroup[] = [
   'chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio'
@@ -39,7 +41,7 @@ function makeEmptySet(type: ExerciseType, setNumber: number): ModalSet {
   }
 }
 
-export default function WorkoutModal({ workout, onClose, onSave }: WorkoutModalProps) {
+export default function WorkoutModal({ workout, template, onClose, onSave }: WorkoutModalProps) {
   const [name, setName] = useState<string>(workout?.name ?? '')
   const [date, setDate] = useState<string>(
     workout?.date ?? new Date().toISOString().split('T')[0]
@@ -80,6 +82,19 @@ export default function WorkoutModal({ workout, onClose, onSave }: WorkoutModalP
             }))
         }))
       setExercises(mapped)
+    } else if (template) {
+      const mapped: ModalExercise[] = template.template_exercises
+        .slice()
+        .sort((a, b) => a.order_index - b.order_index)
+        .map((te) => ({
+          id: te.exercises.id,
+          name: te.exercises.name,
+          type: te.exercises.type,
+          muscle_group: te.exercises.muscle_group,
+          sets: []
+        }))
+      setExercises(mapped)
+      setName(template.name)
     }
   }, [])
 

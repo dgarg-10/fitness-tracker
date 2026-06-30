@@ -59,3 +59,12 @@ def delete_template(template_id):
     ).eq('user_id', user_id).execute()
     return jsonify({'success': True})
 
+@templates_bp.route('/<template_id>', methods=['GET'])
+@require_auth
+def get_template(template_id):
+    user_id = request.user_id
+    result = supabase.table('templates').select(
+        '*, template_exercises(*, exercises(*))'
+    ).eq('id', template_id).eq('user_id', user_id).execute()
+    return jsonify(result.data[0])
+

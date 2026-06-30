@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from "../services/api"
-import type { Workout } from "../types/index"
+import type { Workout, WeeklyPlan, Template } from "../types/index"
 import styles from "./Dashboard.module.css"
 import WorkoutModal from '../components/modals/WorkoutModal'
 
@@ -10,6 +10,27 @@ export default function Dashboard(){
     const [workouts, setWorkouts] = useState<Workout[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
+    const [todaysPlan, setTodaysPlan] = useState<WeeklyPlan | null>(null)
+    const [planTemplate, setPlanTemplate] = useState<Template | null>(null)
+
+    const fetchTodaysPlan = async (): Promise<void> => {
+        const res = await api.get<WeeklyPlan[]>('/api/planner/')
+        const today = new Date()
+        const todayDow = today.getDay()
+        const todayDate = today.toISOString().split('T')[0]
+        const match = res.data.find(
+          (p) => p.day_of_week === todayDow || p.date === todayDate
+        )
+        setTodaysPlan(match ?? null)
+    }
+
+    const startPlannedWorkout = async (): Promise<void> => {
+        if (!todaysPlan?.template_id) return
+        const res = await api.get<Template>(`/api/templates/${todaysPlan.template_id}`)
+        setPlanTemplate(res.data)
+        setEditingWorkout(null)
+        setShowModal(true)
+      }
 
     const fetchWorkouts = async (): Promise<void> => {
         const res = await api.get<Workout[]>('/api/workouts/')
@@ -18,6 +39,7 @@ export default function Dashboard(){
 
     useEffect(() => {
         fetchWorkouts()
+        fetchTodaysPlan()
     }, [])
 
     const recentWorkouts: Workout[] = workouts.slice(0, 5);     
@@ -54,6 +76,22 @@ export default function Dashboard(){
                 <button className={styles.button} onClick={openNew}> + Log Workout</button>
             </div>
 
+
+            {todaysPlan && (
+                <div className={styles.workoutCard}>
+                    <div className={styles.workoutHeader}>
+                    <div>
+                        <span className={styles.workoutName}>Today's Plan</span>
+                        <span className={styles.workoutDate}>
+                        {' '}— {todaysPlan.name ?? todaysPlan.templates?.name ?? 'Workout'}
+                        </span>
+                    </div>
+                    <button className={styles.actionButton} onClick={startPlannedWorkout}>
+                        Start
+                    </button>
+                    </div>
+                </div>
+            )}
             <div className={styles.statsRow}>
                 {[
                     { label: "This Week", value: thisWeekCount},
@@ -104,16 +142,17 @@ export default function Dashboard(){
                 ))
             }
 
-            {/*{ 
-                showModal && (
-                    <WorkoutModal
-                        workout={editingWorkout}
-                        onClose={() => setShowModal(false)}
-                        onSave={fetchWorkouts}
-                    />
-                )
-            }
-            */}
+            {showModal && (
+            <WorkoutModal
+                workout={editingWorkout}
+                template={planTemplate}
+                onClose={() => {
+                setShowModal(false)
+                setPlanTemplate(null)
+                }}
+                onSave={fetchWorkouts}
+            />
+            )}
         </div>
     )
 }
