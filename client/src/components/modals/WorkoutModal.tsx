@@ -75,7 +75,7 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
               set_number: s.set_number,
               weight: s.weight?.toString() ?? '',
               reps: s.reps?.toString() ?? '',
-              bodyweight: s.is_bodyweight ?? false,
+              bodyweight: s.bodyweight ?? false,
               duration_seconds: s.duration_seconds?.toString() ?? '',
               distance_meters: s.distance_meters?.toString() ?? '',
               pace: s.pace ?? ''

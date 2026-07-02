@@ -27,7 +27,7 @@ export interface WorkoutSet {
     set_number: number
     weight?: number | null
     reps?: number | null
-    is_bodyweight?: boolean
+    bodyweight?: boolean
     duration_seconds?: number | null
     distance_meters?: number | null
     pace?: string | null
