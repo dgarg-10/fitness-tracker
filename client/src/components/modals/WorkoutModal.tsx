@@ -162,6 +162,24 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
     setShowDayPicker(false)
   }
 
+  const openExercisePicker = (): void => {
+    setShowExercisePicker(true)
+    setShowTemplatePicker(false)
+    setShowDayPicker(false)
+  }
+
+  const openTemplatePicker = (): void => {
+    setShowTemplatePicker(true)
+    setShowExercisePicker(false)
+    setShowDayPicker(false)
+  }
+
+  const openDayPicker = (): void => {
+    setShowDayPicker(true)
+    setShowExercisePicker(false)
+    setShowTemplatePicker(false)
+  }
+
   const addExercise = (ex: Exercise): void => {
     if (exercises.find((e) => e.id === ex.id)) return
     setExercises((prev) => [
@@ -395,14 +413,35 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
 
         <button
           className={styles.addExerciseButton}
-          onClick={() => setShowExercisePicker(true)}
+          onClick={openExercisePicker}
         >
           + Add Exercise
+        </button>
+        <button
+          className={styles.addExerciseButton}
+          onClick={openTemplatePicker}
+        >
+          + Add Template as Workout
+        </button>
+        <button
+          className={styles.addExerciseButton}
+          onClick={openDayPicker}
+        >
+          + Add From a Planned Day
         </button>
 
         {showExercisePicker && (
           <div className={styles.exercisePicker}>
-            <p className={styles.exercisePickerTitle}>Pick an exercise:</p>
+            <div className={styles.pickerHeader}>
+              <p className={styles.exercisePickerTitle}>Pick an exercise:</p>
+              <button
+                className={styles.pickerCloseButton}
+                onClick={() => setShowExercisePicker(false)}
+                aria-label="Close exercise picker"
+              >
+                ✕
+              </button>
+            </div>
             <div className={styles.exerciseList}>
               {allExercises.map((ex) => (
                 <div
@@ -425,80 +464,6 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
             >
               + Create new exercise
             </button>
-            <button
-              className={styles.createExerciseButton}
-              onClick={() => setShowTemplatePicker(true)}
-            >
-              + Add template as workout
-            </button>
-            <button
-              className={styles.createExerciseButton}
-              onClick={() => setShowDayPicker(true)}
-            >
-              + Add from a planned day
-            </button>
-
-            {showTemplatePicker && (
-              <div className={styles.exercisePicker}>
-                <p className={styles.exercisePickerTitle}>Pick a template:</p>
-                <div className={styles.exerciseList}>
-                  {templates.length === 0 && (
-                    <p className={styles.exerciseTag}>No templates yet.</p>
-                  )}
-                  {templates.map((t) => (
-                    <div
-                      key={t.id}
-                      onClick={() => applyTemplate(t)}
-                      className={styles.exerciseOption}
-                    >
-                      {t.name}
-                      <span className={styles.exerciseTag}>
-                        ({t.template_exercises.map((te) => te.exercises.name).join(', ') || 'no exercises'})
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {showDayPicker && (
-              <div className={styles.exercisePicker}>
-                <p className={styles.exercisePickerTitle}>Pick a planned day:</p>
-                <div className={styles.exerciseList}>
-                  {plannedDayGroups.length === 0 && plannedDateGroups.length === 0 && (
-                    <p className={styles.exerciseTag}>No planned days with templates yet.</p>
-                  )}
-                  {plannedDayGroups.map((g) => (
-                    <div
-                      key={g.label}
-                      onClick={() => applyPlannedTemplateIds(g.templateIds)}
-                      className={styles.exerciseOption}
-                    >
-                      {g.label}
-                      <span className={styles.exerciseTag}>
-                        ({g.templateIds
-                          .map((id) => templates.find((t) => t.id === id)?.name ?? 'Template')
-                          .join(', ')})
-                      </span>
-                    </div>
-                  ))}
-                  {plannedDateGroups.map((g) => (
-                    <div
-                      key={g.label}
-                      onClick={() => applyPlannedTemplateIds(g.templateIds)}
-                      className={styles.exerciseOption}
-                    >
-                      {g.label}
-                      <span className={styles.exerciseTag}>
-                        ({g.templateIds
-                          .map((id) => templates.find((t) => t.id === id)?.name ?? 'Template')
-                          .join(', ')})
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {showNewExerciseForm && (
               <div className={styles.newExerciseForm}>
@@ -546,6 +511,86 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {showTemplatePicker && (
+          <div className={styles.exercisePicker}>
+            <div className={styles.pickerHeader}>
+              <p className={styles.exercisePickerTitle}>Pick a template:</p>
+              <button
+                className={styles.pickerCloseButton}
+                onClick={() => setShowTemplatePicker(false)}
+                aria-label="Close template picker"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.exerciseList}>
+              {templates.length === 0 && (
+                <p className={styles.exerciseTag}>No templates yet.</p>
+              )}
+              {templates.map((t) => (
+                <div
+                  key={t.id}
+                  onClick={() => applyTemplate(t)}
+                  className={styles.exerciseOption}
+                >
+                  {t.name}
+                  <span className={styles.exerciseTag}>
+                    ({t.template_exercises.map((te) => te.exercises.name).join(', ') || 'no exercises'})
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {showDayPicker && (
+          <div className={styles.exercisePicker}>
+            <div className={styles.pickerHeader}>
+              <p className={styles.exercisePickerTitle}>Pick a planned day:</p>
+              <button
+                className={styles.pickerCloseButton}
+                onClick={() => setShowDayPicker(false)}
+                aria-label="Close planned day picker"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.exerciseList}>
+              {plannedDayGroups.length === 0 && plannedDateGroups.length === 0 && (
+                <p className={styles.exerciseTag}>No planned days with templates yet.</p>
+              )}
+              {plannedDayGroups.map((g) => (
+                <div
+                  key={g.label}
+                  onClick={() => applyPlannedTemplateIds(g.templateIds)}
+                  className={styles.exerciseOption}
+                >
+                  {g.label}
+                  <span className={styles.exerciseTag}>
+                    ({g.templateIds
+                      .map((id) => templates.find((t) => t.id === id)?.name ?? 'Template')
+                      .join(', ')})
+                  </span>
+                </div>
+              ))}
+              {plannedDateGroups.map((g) => (
+                <div
+                  key={g.label}
+                  onClick={() => applyPlannedTemplateIds(g.templateIds)}
+                  className={styles.exerciseOption}
+                >
+                  {g.label}
+                  <span className={styles.exerciseTag}>
+                    ({g.templateIds
+                      .map((id) => templates.find((t) => t.id === id)?.name ?? 'Template')
+                      .join(', ')})
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

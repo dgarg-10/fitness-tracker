@@ -191,6 +191,28 @@
     color: #111827;
     margin-bottom: 8px;
   }
+
+  .pickerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pickerCloseButton {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+
+  .pickerCloseButton:hover {
+    background: #fef2f2;
+  }
   
   .exerciseList {
     max-height: 200px;
