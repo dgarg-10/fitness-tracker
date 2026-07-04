@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import api from '../services/api'
-import type { Template, Exercise } from '../types'
+import type { Template, Exercise, MuscleGroup, ExerciseType } from '../types'
 import styles from './Templates.module.css'
 
+interface NewExerciseForm {
+  name: string
+  muscle_group: MuscleGroup
+  type: ExerciseType
+}
+
+const MUSCLE_GROUPS: MuscleGroup[] = [
+  'chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio', 'other'
+]
 
 export default function Templates() {
   const [templates, setTemplates] = useState<Template[]>([])
@@ -12,6 +21,12 @@ export default function Templates() {
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null)
   const [name, setName] = useState<string>('')
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([])
+  const [showNewExerciseForm, setShowNewExerciseForm] = useState<boolean>(false)
+  const [newExercise, setNewExercise] = useState<NewExerciseForm>({
+    name: '',
+    muscle_group: 'chest',
+    type: 'weighted'
+  })
 
   useEffect(() => {
     fetchTemplates()
@@ -32,10 +47,12 @@ export default function Templates() {
     setEditingTemplate(null)
     setName('')
     setSelectedExercises([])
+    setShowNewExerciseForm(false)
     setShowForm(true)
   }
 
   const openEdit = (template: Template): void => {
+    setShowNewExerciseForm(false)
     setEditingTemplate(template)
     setName(template.name)
     setSelectedExercises(template.template_exercises.map((te) => te.exercises))
@@ -66,6 +83,16 @@ export default function Templates() {
         ? prev.filter((e) => e.id !== ex.id)
         : [...prev, ex]
     )
+  }
+
+  const createAndAddExercise = async (): Promise<void> => {
+    if (!newExercise.name.trim()) return
+    const res = await api.post<Exercise>('/api/exercises/', newExercise)
+    const created = res.data
+    setExercises((prev) => [...prev, created])
+    setSelectedExercises((prev) => [...prev, created])
+    setShowNewExerciseForm(false)
+    setNewExercise({ name: '', muscle_group: 'chest', type: 'weighted' })
   }
 
   return (
@@ -135,6 +162,62 @@ export default function Templates() {
                 <span className={styles.exerciseTag}>({ex.muscle_group})</span>
               </div>
             ))}
+
+            <button
+              className={styles.createExerciseButton}
+              onClick={() => setShowNewExerciseForm(true)}
+            >
+              + Create new exercise
+            </button>
+
+            {showNewExerciseForm && (
+              <div className={styles.newExerciseForm}>
+                <input
+                  className={styles.newExerciseInput}
+                  placeholder="Name"
+                  value={newExercise.name}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setNewExercise((p) => ({ ...p, name: e.target.value }))
+                  }
+                />
+                <select
+                  className={styles.newExerciseSelect}
+                  value={newExercise.muscle_group}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                    setNewExercise((p) => ({
+                      ...p,
+                      muscle_group: e.target.value as MuscleGroup
+                    }))
+                  }
+                >
+                  {MUSCLE_GROUPS.map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+                <select
+                  className={styles.newExerciseSelect}
+                  value={newExercise.type}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                    setNewExercise((p) => ({
+                      ...p,
+                      type: e.target.value as ExerciseType
+                    }))
+                  }
+                >
+                  <option value="weighted">Weighted</option>
+                  <option value="bodyweight">Bodyweight</option>
+                  <option value="cardio">Cardio</option>
+                  <option value="other">Other</option>
+                </select>
+                <button
+                  className={styles.newExerciseAddButton}
+                  onClick={createAndAddExercise}
+                >
+                  Add
+                </button>
+              </div>
+            )}
+
             <div className={styles.modalActions}>
               <button className={styles.button} onClick={handleSave}>
                 Save
