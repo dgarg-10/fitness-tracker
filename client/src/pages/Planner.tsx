@@ -39,16 +39,54 @@ export default function Planner() {
     )
   }
 
-  const handleAssign = async (): Promise<void> => {
-    const payload: Record<string, string | number | null | (string | null)[]> = {
-      template_ids: selectedTemplateIds.length ? selectedTemplateIds : [null],
-      name: selectedTemplateIds.length ? null : (customName || null),
-      notes: notes || null
-    }
-    if (tab === 'weekly') payload.day_of_week = selectedDay
-    else payload.date = selectedDate
+  const openDayAssign = (day: number): void => {
+    const existingIds = weeklyPlans
+      .filter((p) => p.day_of_week === day && p.template_id)
+      .map((p) => p.template_id as string)
+    setSelectedTemplateIds(existingIds)
+    setCustomName('')
+    setNotes('')
+    setSelectedDay(day)
+  }
 
-    await api.post('/api/planner/', payload)
+  const handleAssign = async (): Promise<void> => {
+    if (tab === 'weekly' && selectedDay !== null) {
+      const existing = weeklyPlans.filter((p) => p.day_of_week === selectedDay)
+      const existingTemplateIds = existing
+        .filter((p) => p.template_id)
+        .map((p) => p.template_id as string)
+      const toAdd = selectedTemplateIds.filter((id) => !existingTemplateIds.includes(id))
+      const toRemove = existing.filter(
+        (p) => p.template_id && !selectedTemplateIds.includes(p.template_id)
+      )
+
+      await Promise.all(toRemove.map((p) => api.delete(`/api/planner/${p.id}`)))
+
+      if (toAdd.length) {
+        await api.post('/api/planner/', {
+          template_ids: toAdd,
+          name: null,
+          notes: notes || null,
+          day_of_week: selectedDay
+        })
+      } else if (!selectedTemplateIds.length && (customName || notes)) {
+        await api.post('/api/planner/', {
+          template_ids: [null],
+          name: customName || null,
+          notes: notes || null,
+          day_of_week: selectedDay
+        })
+      }
+    } else {
+      const payload: Record<string, string | number | null | (string | null)[]> = {
+        template_ids: selectedTemplateIds.length ? selectedTemplateIds : [null],
+        name: selectedTemplateIds.length ? null : (customName || null),
+        notes: notes || null,
+        date: selectedDate
+      }
+      await api.post('/api/planner/', payload)
+    }
+
     setSelectedDay(null)
     setSelectedDate('')
     setSelectedTemplateIds([])
@@ -93,7 +131,7 @@ export default function Planner() {
                   <span className={styles.dayName}>{day}</span>
                   <button
                     className={styles.assignButton}
-                    onClick={() => setSelectedDay(i)}
+                    onClick={() => openDayAssign(i)}
                   >
                     + Assign
                   </button>
