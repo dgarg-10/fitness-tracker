@@ -24,12 +24,12 @@ def create_template():
     }).execute()
     template_id = template.data[0]['id']
     for i, ex in enumerate(data.get('exercises', [])):
-        supabase.table('templates').insert({
+        supabase.table('template_exercises').insert({
             'template_id': template_id,
             'exercise_id': ex['id'],
             'order_index': i
         }).execute()
-    return template.data[0], 201
+    return jsonify(template.data[0]), 201
 
 @templates_bp.route('/<template_id>', methods=["PUT"])
 @require_auth
