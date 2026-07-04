@@ -8,9 +8,14 @@ import type {
   ModalSet,
   MuscleGroup,
   ExerciseType,
-  Template
+  Template,
+  WeeklyPlan
 } from '../../types'
 import styles from './WorkoutModal.module.css'
+
+const DAYS: string[] = [
+  'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+]
 
 interface NewExerciseForm {
   name: string
@@ -56,9 +61,15 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
     muscle_group: 'chest',
     type: 'weighted'
   })
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>([])
+  const [showTemplatePicker, setShowTemplatePicker] = useState<boolean>(false)
+  const [showDayPicker, setShowDayPicker] = useState<boolean>(false)
 
   useEffect(() => {
     fetchExercises()
+    fetchTemplates()
+    fetchWeeklyPlans()
     if (workout) {
       const mapped: ModalExercise[] = workout.workout_exercises
         .slice()
@@ -101,6 +112,54 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   const fetchExercises = async (): Promise<void> => {
     const res = await api.get<Exercise[]>('/api/exercises/')
     setAllExercises(res.data)
+  }
+
+  const fetchTemplates = async (): Promise<void> => {
+    const res = await api.get<Template[]>('/api/templates/')
+    setTemplates(res.data)
+  }
+
+  const fetchWeeklyPlans = async (): Promise<void> => {
+    const res = await api.get<WeeklyPlan[]>('/api/planner/')
+    setWeeklyPlans(res.data)
+  }
+
+  const mergeTemplateExercises = (templatesToApply: Template[]): void => {
+    setExercises((prev) => {
+      const existingIds = new Set(prev.map((e) => e.id))
+      const additions: ModalExercise[] = []
+      templatesToApply.forEach((t) => {
+        t.template_exercises
+          .slice()
+          .sort((a, b) => a.order_index - b.order_index)
+          .forEach((te) => {
+            if (existingIds.has(te.exercises.id)) return
+            existingIds.add(te.exercises.id)
+            additions.push({
+              id: te.exercises.id,
+              name: te.exercises.name,
+              type: te.exercises.type,
+              muscle_group: te.exercises.muscle_group,
+              sets: []
+            })
+          })
+      })
+      return [...prev, ...additions]
+    })
+  }
+
+  const applyTemplate = (t: Template): void => {
+    mergeTemplateExercises([t])
+    if (!name.trim()) setName(t.name)
+    setShowTemplatePicker(false)
+  }
+
+  const applyPlannedTemplateIds = (templateIds: string[]): void => {
+    const matched = templateIds
+      .map((id) => templates.find((t) => t.id === id))
+      .filter((t): t is Template => !!t)
+    mergeTemplateExercises(matched)
+    setShowDayPicker(false)
   }
 
   const addExercise = (ex: Exercise): void => {
@@ -186,6 +245,26 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
     onSave()
     onClose()
   }
+
+  const plannedDayGroups = DAYS.map((day, i) => ({
+    label: day,
+    templateIds: weeklyPlans
+      .filter((p) => p.day_of_week === i && p.template_id)
+      .map((p) => p.template_id as string)
+  })).filter((g) => g.templateIds.length > 0)
+
+  const plannedDateGroups = Array.from(
+    new Set(
+      weeklyPlans.filter((p) => p.date && p.template_id).map((p) => p.date as string)
+    )
+  )
+    .sort()
+    .map((date) => ({
+      label: date,
+      templateIds: weeklyPlans
+        .filter((p) => p.date === date && p.template_id)
+        .map((p) => p.template_id as string)
+    }))
 
   return (
     <div className={styles.overlay}>
@@ -346,6 +425,80 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
             >
               + Create new exercise
             </button>
+            <button
+              className={styles.createExerciseButton}
+              onClick={() => setShowTemplatePicker(true)}
+            >
+              + Add template as workout
+            </button>
+            <button
+              className={styles.createExerciseButton}
+              onClick={() => setShowDayPicker(true)}
+            >
+              + Add from a planned day
+            </button>
+
+            {showTemplatePicker && (
+              <div className={styles.exercisePicker}>
+                <p className={styles.exercisePickerTitle}>Pick a template:</p>
+                <div className={styles.exerciseList}>
+                  {templates.length === 0 && (
+                    <p className={styles.exerciseTag}>No templates yet.</p>
+                  )}
+                  {templates.map((t) => (
+                    <div
+                      key={t.id}
+                      onClick={() => applyTemplate(t)}
+                      className={styles.exerciseOption}
+                    >
+                      {t.name}
+                      <span className={styles.exerciseTag}>
+                        ({t.template_exercises.map((te) => te.exercises.name).join(', ') || 'no exercises'})
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {showDayPicker && (
+              <div className={styles.exercisePicker}>
+                <p className={styles.exercisePickerTitle}>Pick a planned day:</p>
+                <div className={styles.exerciseList}>
+                  {plannedDayGroups.length === 0 && plannedDateGroups.length === 0 && (
+                    <p className={styles.exerciseTag}>No planned days with templates yet.</p>
+                  )}
+                  {plannedDayGroups.map((g) => (
+                    <div
+                      key={g.label}
+                      onClick={() => applyPlannedTemplateIds(g.templateIds)}
+                      className={styles.exerciseOption}
+                    >
+                      {g.label}
+                      <span className={styles.exerciseTag}>
+                        ({g.templateIds
+                          .map((id) => templates.find((t) => t.id === id)?.name ?? 'Template')
+                          .join(', ')})
+                      </span>
+                    </div>
+                  ))}
+                  {plannedDateGroups.map((g) => (
+                    <div
+                      key={g.label}
+                      onClick={() => applyPlannedTemplateIds(g.templateIds)}
+                      className={styles.exerciseOption}
+                    >
+                      {g.label}
+                      <span className={styles.exerciseTag}>
+                        ({g.templateIds
+                          .map((id) => templates.find((t) => t.id === id)?.name ?? 'Template')
+                          .join(', ')})
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {showNewExerciseForm && (
               <div className={styles.newExerciseForm}>
