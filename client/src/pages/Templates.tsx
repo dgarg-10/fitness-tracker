@@ -22,6 +22,7 @@ export default function Templates() {
   const [name, setName] = useState<string>('')
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([])
   const [showNewExerciseForm, setShowNewExerciseForm] = useState<boolean>(false)
+  const [editingExercise, setEditingExercise] = useState<Exercise | null>(null)
   const [newExercise, setNewExercise] = useState<NewExerciseForm>({
     name: '',
     muscle_group: 'chest',
@@ -85,14 +86,41 @@ export default function Templates() {
     )
   }
 
-  const createAndAddExercise = async (): Promise<void> => {
+  const createOrUpdateExercise = async (): Promise<void> => {
     if (!newExercise.name.trim()) return
-    const res = await api.post<Exercise>('/api/exercises/', newExercise)
-    const created = res.data
-    setExercises((prev) => [...prev, created])
-    setSelectedExercises((prev) => [...prev, created])
+    if (editingExercise) {
+      const res = await api.put<Exercise>(`/api/exercises/${editingExercise.id}`, newExercise)
+      const updated = res.data
+      setExercises((prev) => prev.map((e) => (e.id === updated.id ? updated : e)))
+      setSelectedExercises((prev) => prev.map((e) => (e.id === updated.id ? updated : e)))
+    } else {
+      const res = await api.post<Exercise>('/api/exercises/', newExercise)
+      const created = res.data
+      setExercises((prev) => [...prev, created])
+      setSelectedExercises((prev) => [...prev, created])
+    }
+    closeNewExerciseForm()
+  }
+
+  const openEditExercise = (ex: Exercise): void => {
+    setEditingExercise(ex)
+    setNewExercise({ name: ex.name, muscle_group: ex.muscle_group, type: ex.type })
+    setShowNewExerciseForm(true)
+  }
+
+  const closeNewExerciseForm = (): void => {
     setShowNewExerciseForm(false)
+    setEditingExercise(null)
     setNewExercise({ name: '', muscle_group: 'chest', type: 'weighted' })
+  }
+
+  const handleDeleteExercise = async (id: string): Promise<void> => {
+    if (!window.confirm('Delete this exercise? It will be removed from any templates using it.')) return
+    await api.delete(`/api/exercises/${id}`)
+    setExercises((prev) => prev.filter((e) => e.id !== id))
+    setSelectedExercises((prev) => prev.filter((e) => e.id !== id))
+    if (editingExercise?.id === id) closeNewExerciseForm()
+    fetchTemplates()
   }
 
   return (
@@ -158,14 +186,42 @@ export default function Templates() {
                     : ''
                 }`}
               >
-                {ex.name}
-                <span className={styles.exerciseTag}>({ex.muscle_group})</span>
+                <span>
+                  {ex.name}
+                  <span className={styles.exerciseTag}>({ex.muscle_group})</span>
+                </span>
+                {ex.is_custom && (
+                  <span className={styles.exerciseCustomActions}>
+                    <button
+                      className={styles.actionButton}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEditExercise(ex)
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteExercise(ex.id)
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </span>
+                )}
               </div>
             ))}
 
             <button
               className={styles.createExerciseButton}
-              onClick={() => setShowNewExerciseForm(true)}
+              onClick={() => {
+                setEditingExercise(null)
+                setNewExercise({ name: '', muscle_group: 'chest', type: 'weighted' })
+                setShowNewExerciseForm(true)
+              }}
             >
               + Create new exercise
             </button>
@@ -211,9 +267,16 @@ export default function Templates() {
                 </select>
                 <button
                   className={styles.newExerciseAddButton}
-                  onClick={createAndAddExercise}
+                  onClick={createOrUpdateExercise}
                 >
-                  Add
+                  {editingExercise ? 'Save' : 'Add'}
+                </button>
+                <button
+                  className={styles.newExerciseCloseButton}
+                  onClick={closeNewExerciseForm}
+                  aria-label="Cancel new exercise"
+                >
+                  ✕
                 </button>
               </div>
             )}

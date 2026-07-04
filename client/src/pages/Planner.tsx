@@ -14,8 +14,9 @@ export default function Planner() {
   const [tab, setTab] = useState<'weekly' | 'calendar'>('weekly')
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>('')
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('')
+  const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>([])
   const [customName, setCustomName] = useState<string>('')
+  const [notes, setNotes] = useState<string>('')
 
   useEffect(() => {
     fetchPlans()
@@ -32,10 +33,17 @@ export default function Planner() {
     setTemplates(res.data)
   }
 
+  const toggleTemplate = (id: string): void => {
+    setSelectedTemplateIds((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
+    )
+  }
+
   const handleAssign = async (): Promise<void> => {
-    const payload: Record<string, string | number | null> = {
-      template_id: selectedTemplate || null,
-      name: customName || null
+    const payload: Record<string, string | number | null | (string | null)[]> = {
+      template_ids: selectedTemplateIds.length ? selectedTemplateIds : [null],
+      name: selectedTemplateIds.length ? null : (customName || null),
+      notes: notes || null
     }
     if (tab === 'weekly') payload.day_of_week = selectedDay
     else payload.date = selectedDate
@@ -43,8 +51,9 @@ export default function Planner() {
     await api.post('/api/planner/', payload)
     setSelectedDay(null)
     setSelectedDate('')
-    setSelectedTemplate('')
+    setSelectedTemplateIds([])
     setCustomName('')
+    setNotes('')
     fetchPlans()
   }
 
@@ -91,7 +100,10 @@ export default function Planner() {
                 </div>
                 {dayPlans.map((p) => (
                   <div key={p.id} className={styles.planEntry}>
-                    <span>{p.name ?? p.templates?.name ?? 'Unnamed'}</span>
+                    <div>
+                      <span>{p.name ?? p.templates?.name ?? 'Unnamed'}</span>
+                      {p.notes && <div className={styles.notesText}>{p.notes}</div>}
+                    </div>
                     <button
                       className={styles.removeButton}
                       onClick={() => handleDelete(p.id)}
@@ -108,28 +120,36 @@ export default function Planner() {
 
       {tab === 'calendar' && (
         <div>
-          <div className={styles.calendarControls}>
+          <div className={styles.calendarForm}>
             <input
               className={styles.input}
               type="date"
               value={selectedDate}
               onChange={(e: ChangeEvent<HTMLInputElement>) => setSelectedDate(e.target.value)}
             />
-            <select
-              className={styles.input}
-              value={selectedTemplate}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedTemplate(e.target.value)}
-            >
-              <option value="">-- Select template (optional) --</option>
+            <div className={styles.checklist}>
               {templates.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
+                <label key={t.id} className={styles.checklistItem}>
+                  <input
+                    type="checkbox"
+                    checked={selectedTemplateIds.includes(t.id)}
+                    onChange={() => toggleTemplate(t.id)}
+                  />
+                  {t.name}
+                </label>
               ))}
-            </select>
+            </div>
             <input
               className={styles.input}
-              placeholder="Custom label (optional)"
+              placeholder="Custom label (optional, used when no templates selected)"
               value={customName}
               onChange={(e: ChangeEvent<HTMLInputElement>) => setCustomName(e.target.value)}
+            />
+            <textarea
+              className={styles.notesInput}
+              placeholder="Notes (optional)"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
             />
             <button className={styles.addButton} onClick={handleAssign}>
               Add
@@ -146,6 +166,7 @@ export default function Planner() {
                   <span className={styles.dateLabel}>
                     {p.name ?? p.templates?.name ?? 'Unnamed'}
                   </span>
+                  {p.notes && <div className={styles.notesText}>{p.notes}</div>}
                 </div>
                 <button
                   className={styles.removeButton}
@@ -162,22 +183,30 @@ export default function Planner() {
         <div className={styles.overlay}>
           <div className={styles.modal}>
             <h3 className={styles.modalTitle}>Assign to {DAYS[selectedDay]}</h3>
-            <select
-              className={styles.input}
-              value={selectedTemplate}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedTemplate(e.target.value)}
-              style={{ width: '100%', marginBottom: 8 }}
-            >
-              <option value="">-- Select template (optional) --</option>
+            <div className={styles.checklist} style={{ marginBottom: 8 }}>
               {templates.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
+                <label key={t.id} className={styles.checklistItem}>
+                  <input
+                    type="checkbox"
+                    checked={selectedTemplateIds.includes(t.id)}
+                    onChange={() => toggleTemplate(t.id)}
+                  />
+                  {t.name}
+                </label>
               ))}
-            </select>
+            </div>
             <input
               className={styles.input}
-              placeholder="Custom label (optional)"
+              placeholder="Custom label (optional, used when no templates selected)"
               value={customName}
               onChange={(e: ChangeEvent<HTMLInputElement>) => setCustomName(e.target.value)}
+              style={{ width: '100%', marginBottom: 8 }}
+            />
+            <textarea
+              className={styles.notesInput}
+              placeholder="Notes (optional)"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               style={{ width: '100%' }}
             />
             <div className={styles.modalActions}>
@@ -186,7 +215,12 @@ export default function Planner() {
               </button>
               <button
                 className={styles.cancelButton}
-                onClick={() => setSelectedDay(null)}
+                onClick={() => {
+                  setSelectedDay(null)
+                  setSelectedTemplateIds([])
+                  setCustomName('')
+                  setNotes('')
+                }}
               >
                 Cancel
               </button>

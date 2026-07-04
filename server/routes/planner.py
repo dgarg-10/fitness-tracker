@@ -18,14 +18,19 @@ def get_planner():
 def create_planner():
     user_id = request.user_id
     data = request.json
-    result = supabase.table('weekly_plan').insert({
+    template_ids = data.get('template_ids') or [data.get('template_id')]
+
+    rows = [{
         'user_id': user_id,
         'day_of_week': data.get('day_of_week'),
         'date': data.get('date'),
-        'template_id': data.get('template_id'),
-        'name': data.get('name')
-    }).execute()
-    return jsonify(result.data[0]), 201
+        'template_id': template_id,
+        'name': data.get('name'),
+        'notes': data.get('notes')
+    } for template_id in template_ids]
+
+    result = supabase.table('weekly_plan').insert(rows).execute()
+    return jsonify(result.data), 201
 
 @planner_bp.route('/<weekly_plan_id>', methods=["DELETE"])
 @require_auth

@@ -155,6 +155,9 @@
   }
   
   .exerciseOption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 8px 12px;
     margin-bottom: 4px;
     border-radius: 6px;
@@ -162,6 +165,12 @@
     font-size: 14px;
     color: #374151;
     transition: background 0.15s ease;
+  }
+
+  .exerciseCustomActions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
   }
   
   .exerciseOptionSelected {
@@ -219,6 +228,22 @@
     border-radius: 6px;
     font-size: 13px;
     cursor: pointer;
+  }
+
+  .newExerciseCloseButton {
+    padding: 6px 10px;
+    background: #ffffff;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .newExerciseCloseButton:hover {
+    background: #fef2f2;
   }
 
   .modalActions {

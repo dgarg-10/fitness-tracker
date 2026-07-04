@@ -10,7 +10,12 @@
 .planEntry { display: flex; justify-content: space-between; margin-top: 6px; font-size: 14px; color: #374151; }
 .removeButton { color: #ef4444; background: none; border: none; cursor: pointer; font-size: 12px; }
 .calendarControls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.calendarForm { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; max-width: 420px; }
 .input { padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; color: #111827; }
+.checklist { display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; }
+.checklistItem { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #374151; }
+.notesInput { padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; color: #111827; resize: vertical; min-height: 60px; font-family: inherit; }
+.notesText { font-size: 12px; color: #6b7280; margin-top: 4px; font-style: italic; }
 .addButton { padding: 8px 16px; background: #3b82f6; color: #ffffff; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; }
 .dateCard { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 .dateLabel { margin-left: 12px; color: #6b7280; font-size: 14px; }

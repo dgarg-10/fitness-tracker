@@ -76,6 +76,7 @@ export interface WeeklyPlan {
     date: string | null
     template_id: string | null
     name: string | null
+    notes: string | null
     templates: { name: string } | null
 }
 export interface ProgressPoint {
