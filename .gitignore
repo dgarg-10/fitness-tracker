@@ -3,7 +3,7 @@ server/__pycache__/
 server/**/__pycache__/
 *.pyc
 
-
+CLAUDE.md
 client/node_modules/
 
 client/.env
