@@ -9,10 +9,10 @@ from routes.exercises import exercises_bp
 app = Flask(__name__)
 
 CORS(app, 
-     resources={r"/api/*": {"origins": "your-fitnesstracker.vercel.app"}},
+     resources={r"/api/*": {"origins": "https://fitness-tracker-tau-dusky.vercel.app"}},
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-     supports_credentials=True
+     supports_credentials=False
 )
 
 app.register_blueprint(workouts_bp, url_prefix="/api/workouts")
