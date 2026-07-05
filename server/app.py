@@ -9,7 +9,7 @@ from routes.exercises import exercises_bp
 app = Flask(__name__)
 
 CORS(app, 
-     resources={r"/api/*": {"origins": "https://fitness-tracker-tau-dusky.vercel.app"}},
+     resources={r"/api/*": {"origins": "https://your-fitnesstracker.vercel.app"}},
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      supports_credentials=False
