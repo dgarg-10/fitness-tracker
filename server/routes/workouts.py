@@ -27,13 +27,13 @@ def create_workout():
     }).execute()
     workout_id = workout.data[0]["id"]
     for i, ex in enumerate(data.get('exercises', [])):
-        we = supabase.table("workouts_exercise").insert({
+        we = supabase.table("workout_exercises").insert({
             "workout_id": workout_id,
             "exercise_id": ex["id"],
             "order_index": i
-        })
+        }).execute()
         we_id = we.data[0]["id"]
-        for s in we.get("sets", []):
+        for s in ex.get("sets", []):
             supabase.table("sets").insert({
                 "workout_exercise_id": we_id,
                 "set_number": s["set_number"],
@@ -44,8 +44,8 @@ def create_workout():
                 "duration_meters": s.get("distance_meters") or None,
                 "pace": s.get("pace") or None 
             }).execute()
-        _update_prs(user_id, data.get('exercises', []))
-        return jsonify(workout.data[0]), 201
+    _update_prs(user_id, data.get('exercises', []))
+    return jsonify(workout.data[0]), 201
     
 @workouts_bp.route('/<workout_id>', methods=["PUT"])
 @require_auth
