@@ -19,6 +19,9 @@ def create_planner():
     user_id = request.user_id
     data = request.json
     template_ids = data.get('template_ids') or [data.get('template_id')]
+    template_ids = [t for t in template_ids if t]
+    if not template_ids:
+        return jsonify({"error": "template_id or template_ids is required"}), 400
 
     rows = [{
         'user_id': user_id,

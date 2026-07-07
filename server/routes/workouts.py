@@ -18,6 +18,14 @@ def get_workout():
 def create_workout():
     user_id = request.user_id
     data = request.json
+    if not data.get("name") or not data.get("date"):
+        return jsonify({"error": "name and date are required"}), 400
+    for ex in data.get('exercises', []):
+        if not ex.get("id"):
+            return jsonify({"error": "each exercise requires an id"}), 400
+        for s in ex.get("sets", []):
+            if s.get("set_number") is None:
+                return jsonify({"error": "each set requires a set_number"}), 400
     workout = supabase.table('workouts').insert({
         "user_id": user_id,
         "name": data["name"],
@@ -52,10 +60,20 @@ def create_workout():
 def update_workout(workout_id):
     user_id = request.user_id
     body = request.json
-    supabase.table('workouts').update({
+    if not body.get("name"):
+        return jsonify({"error": "name is required"}), 400
+    for ex in body.get('exercises', []):
+        if not ex.get("id"):
+            return jsonify({"error": "each exercise requires an id"}), 400
+        for s in ex.get("sets", []):
+            if s.get("set_number") is None:
+                return jsonify({"error": "each set requires a set_number"}), 400
+    updated = supabase.table('workouts').update({
         'name': body['name'],
         'notes': body.get('notes')
     }).eq('id', workout_id).eq('user_id', user_id).execute()
+    if not updated.data:
+        return jsonify({'error': 'Not found'}), 404
     supabase.table('workout_exercises').delete().eq(
         'workout_id', workout_id
     ).execute()

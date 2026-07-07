@@ -20,6 +20,8 @@ def get_exercise():
 def create_exercise():
     user_id = request.user_id
     data = request.json
+    if not data.get("name") or not data.get("muscle_group") or not data.get("type"):
+        return jsonify({"error": "name, muscle_group, and type are required"}), 400
     result = supabase.table('exercises').insert({
         'user_id': user_id,
         'name': data['name'],
@@ -35,6 +37,8 @@ def create_exercise():
 def update_exercise(exercise_id):
     user_id = request.user_id
     data = request.json
+    if not data.get("name") or not data.get("muscle_group") or not data.get("type"):
+        return jsonify({"error": "name, muscle_group, and type are required"}), 400
     result = supabase.table('exercises').update({
         'name': data['name'],
         'muscle_group': data['muscle_group'],
@@ -49,6 +53,12 @@ def update_exercise(exercise_id):
 @require_auth
 def delete_exercise(exercise_id):
     user_id = request.user_id
+    owned = supabase.table('exercises').select('id').eq(
+        'id', exercise_id
+    ).eq('user_id', user_id).execute()
+    if not owned.data:
+        return jsonify({'error': 'Not found'}), 404
+
     templates_result = supabase.table('templates').select('id').eq(
         'user_id', user_id
     ).execute()

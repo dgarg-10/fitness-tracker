@@ -10,13 +10,11 @@ def get_exercise_progress(exercise_id):
     user_id = request.user_id
 
     workout_exercises = supabase.table('workout_exercises').select(
-        '*, workouts(date, user_id), sets(*)'
-    ).eq('exercise_id', exercise_id).execute()
+        '*, workouts!inner(date, user_id), sets(*)'
+    ).eq('exercise_id', exercise_id).eq('workouts.user_id', user_id).execute()
 
     points = []
     for we in workout_exercises.data:
-        if we['workouts']['user_id'] != user_id:
-            continue
         weighted_sets = [s for s in we['sets'] if s.get('weight')]
         if not weighted_sets:
             continue

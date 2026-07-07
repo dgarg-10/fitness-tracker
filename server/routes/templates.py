@@ -18,6 +18,11 @@ def get_templates():
 def create_template():
     user_id = request.user_id
     data = request.json
+    if not data.get("name"):
+        return jsonify({"error": "name is required"}), 400
+    for ex in data.get('exercises', []):
+        if not ex.get("id"):
+            return jsonify({"error": "each exercise requires an id"}), 400
     template = supabase.table('templates').insert({
         'name': data['name'],
         'user_id': user_id
@@ -34,11 +39,18 @@ def create_template():
 @templates_bp.route('/<template_id>', methods=["PUT"])
 @require_auth
 def update_template(template_id):
-    user_id = request.user_id   
+    user_id = request.user_id
     body = request.json
-    supabase.table('templates').update({
+    if not body.get("name"):
+        return jsonify({"error": "name is required"}), 400
+    for ex in body.get('exercises', []):
+        if not ex.get("id"):
+            return jsonify({"error": "each exercise requires an id"}), 400
+    updated = supabase.table('templates').update({
         'name': body['name']
     }).eq('id', template_id).eq('user_id', user_id).execute()
+    if not updated.data:
+        return jsonify({'error': 'Not found'}), 404
     supabase.table('template_exercises').delete().eq(
         'template_id', template_id
     ).execute()
@@ -66,5 +78,7 @@ def get_template(template_id):
     result = supabase.table('templates').select(
         '*, template_exercises(*, exercises(*))'
     ).eq('id', template_id).eq('user_id', user_id).execute()
+    if not result.data:
+        return jsonify({'error': 'Not found'}), 404
     return jsonify(result.data[0])
 
