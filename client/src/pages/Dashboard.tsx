@@ -3,6 +3,7 @@ import api from "../services/api"
 import type { Workout, WeeklyPlan, Template } from "../types/index"
 import styles from "./Dashboard.module.css"
 import WorkoutModal from '../components/modals/WorkoutModal'
+import { toLocalDateString } from '../utils/date'
 
 
 
@@ -17,7 +18,7 @@ export default function Dashboard(){
         const res = await api.get<WeeklyPlan[]>('/api/planner/')
         const today = new Date()
         const todayDow = today.getDay()
-        const todayDate = today.toISOString().split('T')[0]
+        const todayDate = toLocalDateString(today)
         const match = res.data.find(
           (p) => p.day_of_week === todayDow || p.date === todayDate
         )

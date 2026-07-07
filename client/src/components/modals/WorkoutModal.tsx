@@ -12,6 +12,7 @@ import type {
   WeeklyPlan
 } from '../../types'
 import styles from './WorkoutModal.module.css'
+import { toLocalDateString } from '../../utils/date'
 
 const DAYS: string[] = [
   'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
@@ -49,7 +50,7 @@ function makeEmptySet(type: ExerciseType, setNumber: number): ModalSet {
 export default function WorkoutModal({ workout, template, onClose, onSave }: WorkoutModalProps) {
   const [name, setName] = useState<string>(workout?.name ?? '')
   const [date, setDate] = useState<string>(
-    workout?.date ?? new Date().toISOString().split('T')[0]
+    workout?.date ?? toLocalDateString(new Date())
   )
   const [notes, setNotes] = useState<string>(workout?.notes ?? '')
   const [exercises, setExercises] = useState<ModalExercise[]>([])
