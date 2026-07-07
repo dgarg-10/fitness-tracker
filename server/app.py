@@ -8,8 +8,11 @@ from routes.exercises import exercises_bp
 
 app = Flask(__name__)
 
-CORS(app, 
-     resources={r"/api/*": {"origins": "https://your-fitnesstracker.vercel.app"}},
+CORS(app,
+     resources={r"/api/*": {"origins": [
+         "https://your-fitnesstracker.vercel.app",
+         "http://localhost:5173"
+     ]}},
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      supports_credentials=False
