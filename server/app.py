@@ -25,4 +25,4 @@ app.register_blueprint(planner_bp, url_prefix="/api/planner")
 app.register_blueprint(exercises_bp, url_prefix="/api/exercises")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5003)
