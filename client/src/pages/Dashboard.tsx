@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from "../services/api"
-import type { Workout, WeeklyPlan, Template } from "../types/index"
+import type { Workout, WeeklyPlan, Template, TemplateExercise } from "../types/index"
 import styles from "./Dashboard.module.css"
 import WorkoutModal from '../components/modals/WorkoutModal'
 import { toLocalDateString } from '../utils/date'
@@ -11,7 +11,7 @@ export default function Dashboard(){
     const [workouts, setWorkouts] = useState<Workout[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
-    const [todaysPlan, setTodaysPlan] = useState<WeeklyPlan | null>(null)
+    const [todaysPlans, setTodaysPlans] = useState<WeeklyPlan[]>([])
     const [planTemplate, setPlanTemplate] = useState<Template | null>(null)
 
     const fetchTodaysPlan = async (): Promise<void> => {
@@ -19,16 +19,43 @@ export default function Dashboard(){
         const today = new Date()
         const todayDow = today.getDay()
         const todayDate = toLocalDateString(today)
-        const match = res.data.find(
+        const matches = res.data.filter(
           (p) => p.day_of_week === todayDow || p.date === todayDate
         )
-        setTodaysPlan(match ?? null)
+        setTodaysPlans(matches)
     }
 
     const startPlannedWorkout = async (): Promise<void> => {
-        if (!todaysPlan?.template_id) return
-        const res = await api.get<Template>(`/api/templates/${todaysPlan.template_id}`)
-        setPlanTemplate(res.data)
+        const templateIds = todaysPlans
+            .map((p) => p.template_id)
+            .filter((id): id is string => !!id)
+        if (templateIds.length === 0) return
+
+        const results = await Promise.all(
+            templateIds.map((id) => api.get<Template>(`/api/templates/${id}`))
+        )
+        const fetchedTemplates = results.map((r) => r.data)
+
+        const seenExerciseIds = new Set<string>()
+        const mergedExercises: TemplateExercise[] = []
+        fetchedTemplates.forEach((t) => {
+            t.template_exercises
+                .slice()
+                .sort((a, b) => a.order_index - b.order_index)
+                .forEach((te) => {
+                    if (seenExerciseIds.has(te.exercise_id)) return
+                    seenExerciseIds.add(te.exercise_id)
+                    mergedExercises.push({ ...te, order_index: mergedExercises.length })
+                })
+        })
+
+        setPlanTemplate({
+            id: 'today',
+            user_id: fetchedTemplates[0]?.user_id ?? '',
+            name: fetchedTemplates.map((t) => t.name).join(', '),
+            created_at: '',
+            template_exercises: mergedExercises
+        })
         setEditingWorkout(null)
         setShowModal(true)
       }
@@ -78,18 +105,20 @@ export default function Dashboard(){
             </div>
 
 
-            {todaysPlan && (
+            {todaysPlans.length > 0 && (
                 <div className={styles.workoutCard}>
                     <div className={styles.workoutHeader}>
-                    <div>
-                        <span className={styles.workoutName}>Today's Plan</span>
-                        <span className={styles.workoutDate}>
-                        {' '}— {todaysPlan.name ?? todaysPlan.templates?.name ?? 'Workout'}
-                        </span>
-                    </div>
-                    <button className={styles.actionButton} onClick={startPlannedWorkout}>
-                        Start
-                    </button>
+                        <div>
+                            <span className={styles.workoutName}>Today's Plan</span>
+                            <span className={styles.workoutDate}>
+                                {' '}— {todaysPlans
+                                    .map((plan) => plan.name ?? plan.templates?.name ?? 'Workout')
+                                    .join(', ')}
+                            </span>
+                        </div>
+                        <button className={styles.actionButton} onClick={startPlannedWorkout}>
+                            Start
+                        </button>
                     </div>
                 </div>
             )}
@@ -128,7 +157,7 @@ export default function Dashboard(){
                                 <button className={styles.actionButton} onClick={() => openEdit(workout)}>
                                     Edit
                                 </button>
-                                <button className={styles.deleteButton} onClick={() => handleDelete}>
+                                <button className={styles.deleteButton} onClick={() => handleDelete(workout.id)}>
                                     Delete
                                 </button>
                             </div>

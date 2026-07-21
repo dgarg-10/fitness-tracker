@@ -36,6 +36,9 @@ api.interceptors.response.use(
   },
   (error) => {
     setPendingRequests(pendingRequests - 1)
+    if (error.response?.status === 401) {
+      supabase.auth.signOut()
+    }
     return Promise.reject(error)
   }
 )

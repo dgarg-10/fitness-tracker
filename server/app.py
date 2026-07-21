@@ -11,7 +11,8 @@ app = Flask(__name__)
 CORS(app,
      resources={r"/api/*": {"origins": [
          "https://your-fitnesstracker.vercel.app",
-         "http://localhost:5173"
+         "http://localhost:5173",
+         "http://localhost:5174"
      ]}},
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
