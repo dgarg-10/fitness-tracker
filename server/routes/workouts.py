@@ -49,8 +49,8 @@ def create_workout():
                 "reps": s.get("reps") or None,
                 "bodyweight": s.get('bodyweight', False),
                 "duration_seconds": s.get("duration_seconds") or None,
-                "duration_meters": s.get("distance_meters") or None,
-                "pace": s.get("pace") or None 
+                "distance_meters": s.get("distance_meters") or None,
+                "pace": s.get("pace") or None
             }).execute()
     _update_prs(user_id, data.get('exercises', []))
     return jsonify(workout.data[0]), 201
