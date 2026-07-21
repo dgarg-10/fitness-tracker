@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react'
 import api from '../../services/api'
 import type {
   Workout,
+  WorkoutSet,
   Exercise,
   ModalExercise,
   ModalSet,
@@ -47,6 +48,21 @@ function makeEmptySet(type: ExerciseType, setNumber: number): ModalSet {
   }
 }
 
+function toModalSets(sets: WorkoutSet[]): ModalSet[] {
+  return sets
+    .slice()
+    .sort((a, b) => a.set_number - b.set_number)
+    .map((s) => ({
+      set_number: s.set_number,
+      weight: s.weight?.toString() ?? '',
+      reps: s.reps?.toString() ?? '',
+      bodyweight: s.bodyweight ?? false,
+      duration_seconds: s.duration_seconds?.toString() ?? '',
+      distance_meters: s.distance_meters?.toString() ?? '',
+      pace: s.pace ?? ''
+    }))
+}
+
 export default function WorkoutModal({ workout, template, onClose, onSave }: WorkoutModalProps) {
   const [name, setName] = useState<string>(workout?.name ?? '')
   const [date, setDate] = useState<string>(
@@ -66,48 +82,43 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>([])
   const [showTemplatePicker, setShowTemplatePicker] = useState<boolean>(false)
   const [showDayPicker, setShowDayPicker] = useState<boolean>(false)
+  const [pastWorkouts, setPastWorkouts] = useState<Workout[]>([])
 
   useEffect(() => {
     fetchExercises()
     fetchTemplates()
     fetchWeeklyPlans()
-    if (workout) {
-      const mapped: ModalExercise[] = workout.workout_exercises
-        .slice()
-        .sort((a, b) => a.order_index - b.order_index)
-        .map((we) => ({
-          id: we.exercises.id,
-          name: we.exercises.name,
-          type: we.exercises.type,
-          muscle_group: we.exercises.muscle_group,
-          sets: we.sets
-            .slice()
-            .sort((a, b) => a.set_number - b.set_number)
-            .map((s) => ({
-              set_number: s.set_number,
-              weight: s.weight?.toString() ?? '',
-              reps: s.reps?.toString() ?? '',
-              bodyweight: s.bodyweight ?? false,
-              duration_seconds: s.duration_seconds?.toString() ?? '',
-              distance_meters: s.distance_meters?.toString() ?? '',
-              pace: s.pace ?? ''
-            }))
-        }))
-      setExercises(mapped)
-    } else if (template) {
-      const mapped: ModalExercise[] = template.template_exercises
-        .slice()
-        .sort((a, b) => a.order_index - b.order_index)
-        .map((te) => ({
-          id: te.exercises.id,
-          name: te.exercises.name,
-          type: te.exercises.type,
-          muscle_group: te.exercises.muscle_group,
-          sets: []
-        }))
-      setExercises(mapped)
-      setName(template.name)
+
+    const init = async (): Promise<void> => {
+      const history = await fetchPastWorkouts()
+      if (workout) {
+        const mapped: ModalExercise[] = workout.workout_exercises
+          .slice()
+          .sort((a, b) => a.order_index - b.order_index)
+          .map((we) => ({
+            id: we.exercises.id,
+            name: we.exercises.name,
+            type: we.exercises.type,
+            muscle_group: we.exercises.muscle_group,
+            sets: toModalSets(we.sets)
+          }))
+        setExercises(mapped)
+      } else if (template) {
+        const mapped: ModalExercise[] = template.template_exercises
+          .slice()
+          .sort((a, b) => a.order_index - b.order_index)
+          .map((te) => ({
+            id: te.exercises.id,
+            name: te.exercises.name,
+            type: te.exercises.type,
+            muscle_group: te.exercises.muscle_group,
+            sets: getLastLoggedSets(te.exercises.id, history)
+          }))
+        setExercises(mapped)
+        setName(template.name)
+      }
     }
+    init()
   }, [])
 
   const fetchExercises = async (): Promise<void> => {
@@ -123,6 +134,20 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   const fetchWeeklyPlans = async (): Promise<void> => {
     const res = await api.get<WeeklyPlan[]>('/api/planner/')
     setWeeklyPlans(res.data)
+  }
+
+  const fetchPastWorkouts = async (): Promise<Workout[]> => {
+    const res = await api.get<Workout[]>('/api/workouts/')
+    setPastWorkouts(res.data)
+    return res.data
+  }
+
+  const getLastLoggedSets = (exerciseId: string, history: Workout[]): ModalSet[] => {
+    for (const w of history) {
+      const match = w.workout_exercises.find((we) => we.exercise_id === exerciseId)
+      if (match && match.sets.length > 0) return toModalSets(match.sets)
+    }
+    return []
   }
 
   const mergeTemplateExercises = (templatesToApply: Template[]): void => {
@@ -141,7 +166,7 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
               name: te.exercises.name,
               type: te.exercises.type,
               muscle_group: te.exercises.muscle_group,
-              sets: []
+              sets: getLastLoggedSets(te.exercises.id, pastWorkouts)
             })
           })
       })
@@ -190,7 +215,7 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
         name: ex.name,
         type: ex.type,
         muscle_group: ex.muscle_group,
-        sets: []
+        sets: getLastLoggedSets(ex.id, pastWorkouts)
       }
     ])
     setShowExercisePicker(false)
