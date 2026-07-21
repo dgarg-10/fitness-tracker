@@ -1,49 +1,50 @@
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
   }
-  
+
   .modal {
-    background: #ffffff;
+    background: #17171a;
     border-radius: 12px;
     padding: 24px;
     width: 620px;
     max-height: 90vh;
     overflow-y: auto;
   }
-  
+
   .modalTitle {
     font-size: 18px;
     font-weight: 600;
-    color: #111827;
+    color: #f4f4f5;
     margin-bottom: 16px;
   }
-  
+
   .input {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #3f3f46;
     border-radius: 8px;
     font-size: 14px;
     margin-bottom: 8px;
     outline: none;
     transition: border-color 0.15s ease;
-    color: #111827;
+    color: #f4f4f5;
+    background: #1c1c1f;
   }
-  
+
   .input:focus {
     border-color: #3b82f6;
   }
-  
+
   .textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #3f3f46;
     border-radius: 8px;
     font-size: 14px;
     margin-bottom: 16px;
@@ -51,91 +52,95 @@
     resize: vertical;
     min-height: 72px;
     transition: border-color 0.15s ease;
-    color: #111827;
+    color: #f4f4f5;
+    background: #1c1c1f;
   }
-  
+
   .textarea:focus {
     border-color: #3b82f6;
   }
-  
+
   .exerciseCard {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #26262a;
+    background: #151517;
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 12px;
   }
-  
+
   .exerciseHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
   }
-  
+
   .exerciseName {
     font-weight: 600;
     font-size: 14px;
-    color: #111827;
+    color: #f4f4f5;
   }
-  
+
   .removeButton {
     font-size: 12px;
-    color: #ef4444;
+    color: #f87171;
     background: none;
     border: none;
     cursor: pointer;
     padding: 2px 6px;
   }
-  
+
   .setRow {
     display: flex;
     gap: 8px;
     align-items: center;
     margin-bottom: 6px;
   }
-  
+
   .setNumber {
     width: 24px;
     font-size: 12px;
     color: #9ca3af;
     flex-shrink: 0;
   }
-  
+
   .setInput {
     padding: 6px 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #3f3f46;
     border-radius: 6px;
     font-size: 13px;
     width: 80px;
     outline: none;
-    color: #111827;
+    color: #f4f4f5;
+    background: #1c1c1f;
     transition: border-color 0.15s ease;
   }
-  
+
   .setInput:focus {
     border-color: #3b82f6;
   }
-  
+
   .setInputWide {
     padding: 6px 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #3f3f46;
     border-radius: 6px;
     font-size: 13px;
     width: 100px;
     outline: none;
-    color: #111827;
+    color: #f4f4f5;
+    background: #1c1c1f;
     transition: border-color 0.15s ease;
   }
-  
+
   .setInputWide:focus {
     border-color: #3b82f6;
   }
-  
+
   .multiply {
     color: #9ca3af;
     font-size: 13px;
   }
-  
+
   .deleteSetButton {
     color: #9ca3af;
     background: none;
@@ -145,11 +150,11 @@
     padding: 2px 4px;
     margin-left: 2px;
   }
-  
+
   .deleteSetButton:hover {
-    color: #ef4444;
+    color: #f87171;
   }
-  
+
   .addSetButton {
     margin-top: 6px;
     font-size: 13px;
@@ -159,36 +164,37 @@
     cursor: pointer;
     padding: 2px 0;
   }
-  
+
   .addExerciseButton {
     width: 100%;
     padding: 10px;
     margin-bottom: 16px;
-    border: 1px dashed #d1d5db;
+    border: 1px dashed #3f3f46;
     border-radius: 8px;
     cursor: pointer;
     background: none;
-    color: #6b7280;
+    color: #a1a1aa;
     font-size: 14px;
     transition: border-color 0.15s ease, color 0.15s ease;
   }
-  
+
   .addExerciseButton:hover {
     border-color: #3b82f6;
     color: #3b82f6;
   }
-  
+
   .exercisePicker {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #26262a;
+    background: #151517;
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 16px;
   }
-  
+
   .exercisePickerTitle {
     font-size: 13px;
     font-weight: 600;
-    color: #111827;
+    color: #f4f4f5;
     margin-bottom: 8px;
   }
 
@@ -201,7 +207,7 @@
   .pickerCloseButton {
     background: none;
     border: none;
-    color: #ef4444;
+    color: #f87171;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -211,38 +217,38 @@
   }
 
   .pickerCloseButton:hover {
-    background: #fef2f2;
+    background: #2a1616;
   }
-  
+
   .exerciseList {
     max-height: 200px;
     overflow-y: auto;
   }
-  
+
   .exerciseOption {
     padding: 6px 10px;
     cursor: pointer;
     border-radius: 6px;
     font-size: 13px;
-    color: #374151;
+    color: #d4d4d8;
     transition: background 0.15s ease;
   }
-  
+
   .exerciseOption:hover {
-    background: #f3f4f6;
+    background: #232327;
   }
-  
+
   .exerciseOptionSelected {
-    background: #f0fdf4;
-    color: #166534;
+    background: #052e1a;
+    color: #4ade80;
   }
-  
+
   .exerciseTag {
     font-size: 11px;
     color: #9ca3af;
     margin-left: 6px;
   }
-  
+
   .createExerciseButton {
     margin-top: 8px;
     font-size: 13px;
@@ -252,33 +258,35 @@
     cursor: pointer;
     padding: 2px 0;
   }
-  
+
   .newExerciseForm {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
     margin-top: 8px;
   }
-  
+
   .newExerciseInput {
     padding: 6px 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #3f3f46;
     border-radius: 6px;
     font-size: 13px;
     flex: 1;
     outline: none;
-    color: #111827;
+    color: #f4f4f5;
+    background: #1c1c1f;
   }
-  
+
   .newExerciseSelect {
     padding: 6px 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #3f3f46;
     border-radius: 6px;
     font-size: 13px;
-    color: #111827;
+    color: #f4f4f5;
+    background: #1c1c1f;
     outline: none;
   }
-  
+
   .newExerciseAddButton {
     padding: 6px 12px;
     background: #3b82f6;
@@ -288,14 +296,14 @@
     font-size: 13px;
     cursor: pointer;
   }
-  
+
   .modalActions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
     margin-top: 8px;
   }
-  
+
   .saveButton {
     background: #3b82f6;
     color: #ffffff;
@@ -307,22 +315,22 @@
     cursor: pointer;
     transition: background 0.15s ease;
   }
-  
+
   .saveButton:hover {
     background: #2563eb;
   }
-  
+
   .cancelButton {
     padding: 10px 20px;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-    color: #374151;
+    border: 1px solid #3f3f46;
+    background: #1c1c1f;
+    color: #d4d4d8;
     font-size: 14px;
     cursor: pointer;
     transition: background 0.15s ease;
   }
-  
+
   .cancelButton:hover {
-    background: #f3f4f6;
+    background: #232327;
   }

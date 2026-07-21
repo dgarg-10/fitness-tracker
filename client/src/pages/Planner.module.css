@@ -1,26 +1,26 @@
 .container { max-width: 800px; margin: 0 auto; padding: 32px 24px; }
-.title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 16px; }
+.title { font-size: 24px; font-weight: 700; color: #f4f4f5; margin-bottom: 16px; }
 .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-.tab { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; background: #f3f4f6; color: #374151; font-size: 14px; }
+.tab { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; background: #1c1c1f; color: #d4d4d8; font-size: 14px; }
 .tabActive { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; background: #3b82f6; color: #ffffff; font-size: 14px; }
-.dayRow { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.dayRow { border: 1px solid #26262a; border-radius: 8px; padding: 12px; margin-bottom: 8px; background: #151517; }
 .dayHeader { display: flex; justify-content: space-between; align-items: center; }
-.dayName { font-weight: 600; color: #111827; font-size: 14px; }
+.dayName { font-weight: 600; color: #f4f4f5; font-size: 14px; }
 .assignButton { font-size: 13px; color: #3b82f6; background: none; border: none; cursor: pointer; }
-.planEntry { display: flex; justify-content: space-between; margin-top: 6px; font-size: 14px; color: #374151; }
-.removeButton { color: #ef4444; background: none; border: none; cursor: pointer; font-size: 12px; }
+.planEntry { display: flex; justify-content: space-between; margin-top: 6px; font-size: 14px; color: #d4d4d8; }
+.removeButton { color: #f87171; background: none; border: none; cursor: pointer; font-size: 12px; }
 .calendarControls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .calendarForm { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; max-width: 420px; }
-.input { padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; color: #111827; }
-.checklist { display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; }
-.checklistItem { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #374151; }
-.notesInput { padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; color: #111827; resize: vertical; min-height: 60px; font-family: inherit; }
-.notesText { font-size: 12px; color: #6b7280; margin-top: 4px; font-style: italic; }
+.input { padding: 8px; border-radius: 6px; border: 1px solid #3f3f46; background: #1c1c1f; font-size: 14px; color: #f4f4f5; }
+.checklist { display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; border: 1px solid #3f3f46; background: #1c1c1f; border-radius: 6px; padding: 8px; }
+.checklistItem { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #d4d4d8; }
+.notesInput { padding: 8px; border-radius: 6px; border: 1px solid #3f3f46; background: #1c1c1f; font-size: 14px; color: #f4f4f5; resize: vertical; min-height: 60px; font-family: inherit; }
+.notesText { font-size: 12px; color: #a1a1aa; margin-top: 4px; font-style: italic; }
 .addButton { padding: 8px 16px; background: #3b82f6; color: #ffffff; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; }
-.dateCard { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-.dateLabel { margin-left: 12px; color: #6b7280; font-size: 14px; }
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal { background: #ffffff; border-radius: 12px; padding: 24px; width: 400px; }
-.modalTitle { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 16px; }
+.dateCard { border: 1px solid #26262a; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; background: #151517; }
+.dateLabel { margin-left: 12px; color: #a1a1aa; font-size: 14px; }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal { background: #17171a; border-radius: 12px; padding: 24px; width: 400px; }
+.modalTitle { font-size: 16px; font-weight: 600; color: #f4f4f5; margin-bottom: 16px; }
 .modalActions { display: flex; gap: 8px; margin-top: 16px; }
-.cancelButton { padding: 8px 16px; border-radius: 6px; border: 1px solid #e5e7eb; background: #ffffff; color: #374151; cursor: pointer; font-size: 14px; }
+.cancelButton { padding: 8px 16px; border-radius: 6px; border: 1px solid #3f3f46; background: #1c1c1f; color: #d4d4d8; cursor: pointer; font-size: 14px; }

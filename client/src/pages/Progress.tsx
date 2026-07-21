@@ -65,10 +65,15 @@ export default function Progress() {
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={progressData.points}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                <YAxis unit=" lbs" tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(val) => [`${val} lbs`, 'Max Weight']} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#26262a" />
+                <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#a1a1aa' }} stroke="#3f3f46" />
+                <YAxis unit=" lbs" tick={{ fontSize: 12, fill: '#a1a1aa' }} stroke="#3f3f46" />
+                <Tooltip
+                  formatter={(val) => [`${val} lbs`, 'Max Weight']}
+                  contentStyle={{ background: '#17171a', border: '1px solid #3f3f46', borderRadius: 8 }}
+                  labelStyle={{ color: '#f4f4f5' }}
+                  itemStyle={{ color: '#f4f4f5' }}
+                />
                 <Line
                   type="monotone"
                   dataKey="max_weight"

@@ -3,52 +3,52 @@
     align-items: center;
     padding: 0 24px;
     height: 56px;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+    background: #111113;
+    border-bottom: 1px solid #26262a;
     position: sticky;
     top: 0;
     z-index: 100;
     gap: 4px;
   }
-  
+
   .logo {
     font-weight: 700;
     font-size: 18px;
-    color: #111827;
+    color: #f4f4f5;
     margin-right: 24px;
     text-decoration: none;
   }
-  
+
   .links {
     display: flex;
     align-items: center;
     gap: 4px;
   }
-  
+
   .link {
     padding: 6px 12px;
     border-radius: 6px;
     text-decoration: none;
     font-size: 14px;
-    color: #374151;
+    color: #d4d4d8;
     font-weight: 400;
     transition: background 0.15s ease, color 0.15s ease;
   }
-  
+
   .link:hover {
-    background: #f3f4f6;
+    background: #232327;
   }
-  
+
   .linkActive {
-    background: #eff6ff;
-    color: #3b82f6;
+    background: #1e3a5f;
+    color: #60a5fa;
     font-weight: 600;
   }
-  
+
   .signOut {
     margin-left: auto;
     font-size: 14px;
-    color: #6b7280;
+    color: #a1a1aa;
     background: none;
     border: none;
     cursor: pointer;
@@ -56,8 +56,8 @@
     border-radius: 6px;
     transition: background 0.15s ease;
   }
-  
+
   .signOut:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: #232327;
+    color: #f4f4f5;
   }

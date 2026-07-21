@@ -30,35 +30,68 @@ export default function Auth(){
         setLoading(false)
     }
     return (
-        <div style={{ maxWidth: 400, margin: '100px auto', padding: 24 }}>
-          <h2 style={{ marginBottom: 16 }}>
+        <div style={{
+          maxWidth: 400,
+          margin: '100px auto',
+          padding: 24,
+          background: '#17171a',
+          border: '1px solid #26262a',
+          borderRadius: 12
+        }}>
+          <h2 style={{ marginBottom: 16, color: '#f4f4f5' }}>
             {isLogin ? 'Log In' : 'Sign Up'}
           </h2>
           <input
             placeholder="Email"
             value={email}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-            style={{ display: 'block', marginBottom: 8, width: '100%', padding: 8 }}
+            style={{
+              display: 'block',
+              marginBottom: 8,
+              width: '100%',
+              padding: 8,
+              background: '#1c1c1f',
+              color: '#f4f4f5',
+              border: '1px solid #3f3f46',
+              borderRadius: 8
+            }}
           />
           <input
             placeholder="Password"
             type="password"
             value={password}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-            style={{ display: 'block', marginBottom: 8, width: '100%', padding: 8 }}
+            style={{
+              display: 'block',
+              marginBottom: 8,
+              width: '100%',
+              padding: 8,
+              background: '#1c1c1f',
+              color: '#f4f4f5',
+              border: '1px solid #3f3f46',
+              borderRadius: 8
+            }}
           />
           {error && (
-            <p style={{ color: 'red', marginBottom: 8 }}>{error}</p>
+            <p style={{ color: '#f87171', marginBottom: 8 }}>{error}</p>
           )}
           <button
             onClick={handleSubmit}
             disabled={loading}
-            style={{ width: '100%', padding: 10 }}
+            style={{
+              width: '100%',
+              padding: 10,
+              background: '#3b82f6',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: 8,
+              fontWeight: 600
+            }}
           >
             {loading ? 'Loading...' : isLogin ? 'Log In' : 'Sign Up'}
           </button>
           <p
-            style={{ marginTop: 12, cursor: 'pointer', color: '#3b82f6' }}
+            style={{ marginTop: 12, cursor: 'pointer', color: '#60a5fa' }}
             onClick={() => setIsLogin(!isLogin)}
           >
             {isLogin ? 'Need an account? Sign up' : 'Have an account? Log in'}
