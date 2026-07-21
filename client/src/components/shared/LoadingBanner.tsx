@@ -7,8 +7,9 @@ export default function LoadingBanner() {
   if (!isLoading) return null
 
   return (
-    <div className={styles.banner} role="status">
-      Loading data, please wait...
+    <div className={styles.track} role="status">
+      <div className={styles.bar} />
+      <span className={styles.srOnly}>Loading data, please wait...</span>
     </div>
   )
 }
