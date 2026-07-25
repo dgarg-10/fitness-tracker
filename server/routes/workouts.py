@@ -109,17 +109,28 @@ def delete_exercise(workout_id):
 
 def _update_prs(user_id, exercises):
     for ex in exercises:
+        workout_exercises = supabase.table('workout_exercises').select(
+            '*, workouts!inner(user_id), sets(*)'
+        ).eq('exercise_id', ex['id']).eq('workouts.user_id', user_id).execute()
+
         weighted_sets = [
-            s for s in ex.get('sets', [])
+            s for we in workout_exercises.data for s in we.get('sets', [])
             if s.get('weight') and s.get('reps')
         ]
-        if not weighted_sets:
-            continue
-        best = max(weighted_sets, key=lambda s: float(s.get('weight', 0)))
+
         existing = supabase.table('personal_records').select('*').eq(
             'user_id', user_id
         ).eq('exercise_id', ex['id']).execute()
-        if not existing.data or float(best.get('weight', 0)) > float(existing.data[0]['weight'] or 0):
+
+        if not weighted_sets:
+            if existing.data:
+                supabase.table('personal_records').delete().eq(
+                    'id', existing.data[0]['id']
+                ).execute()
+            continue
+
+        best = max(weighted_sets, key=lambda s: float(s.get('weight', 0)))
+        if not existing.data or float(best.get('weight', 0)) != float(existing.data[0]['weight'] or 0) or int(best.get('reps', 0)) != int(existing.data[0]['reps'] or 0):
             if existing.data:
                 supabase.table('personal_records').delete().eq(
                     'id', existing.data[0]['id']
