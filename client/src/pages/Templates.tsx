@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import api from '../services/api'
 import type { Template, Exercise, MuscleGroup, ExerciseType } from '../types'
+import ConfirmDeleteModal from '../components/modals/ConfirmDeleteModal'
 import styles from './Templates.module.css'
 
 interface NewExerciseForm {
@@ -19,6 +20,7 @@ export default function Templates() {
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [showForm, setShowForm] = useState<boolean>(false)
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null)
+  const [deletingTemplateId, setDeletingTemplateId] = useState<string | null>(null)
   const [name, setName] = useState<string>('')
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([])
   const [showNewExerciseForm, setShowNewExerciseForm] = useState<boolean>(false)
@@ -69,12 +71,6 @@ export default function Templates() {
       await api.post('/api/templates/', payload)
     }
     setShowForm(false)
-    fetchTemplates()
-  }
-
-  const handleDelete = async (id: string): Promise<void> => {
-    if (!window.confirm('Delete this template?')) return
-    await api.delete(`/api/templates/${id}`)
     fetchTemplates()
   }
 
@@ -151,7 +147,7 @@ export default function Templates() {
               </button>
               <button
                 className={styles.deleteButton}
-                onClick={() => handleDelete(t.id)}
+                onClick={() => setDeletingTemplateId(t.id)}
               >
                 Delete
               </button>
@@ -294,6 +290,18 @@ export default function Templates() {
             </div>
           </div>
         </div>
+      )}
+
+      {deletingTemplateId && (
+        <ConfirmDeleteModal
+          title="Delete Template"
+          message="Delete this template? This action cannot be undone."
+          onClose={() => setDeletingTemplateId(null)}
+          onConfirm={async () => {
+            await api.delete(`/api/templates/${deletingTemplateId}`)
+            fetchTemplates()
+          }}
+        />
       )}
     </div>
   )

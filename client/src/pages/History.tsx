@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react'
 import api from '../services/api'
 import type { Workout } from '../types'
 import WorkoutModal from '../components/modals/WorkoutModal'
+import ConfirmDeleteModal from '../components/modals/ConfirmDeleteModal'
 import styles from './History.module.css'
 
 export default function History() {
@@ -10,6 +11,7 @@ export default function History() {
   const [search, setSearch] = useState<string>('')
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
+  const [deletingWorkoutId, setDeletingWorkoutId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchWorkouts()
@@ -18,12 +20,6 @@ export default function History() {
   const fetchWorkouts = async (): Promise<void> => {
     const res = await api.get<Workout[]>('/api/workouts/')
     setWorkouts(res.data)
-  }
-
-  const handleDelete = async (id: string): Promise<void> => {
-    if (!window.confirm('Delete this workout?')) return
-    await api.delete(`/api/workouts/${id}`)
-    fetchWorkouts()
   }
 
   const filtered = workouts.filter(
@@ -71,7 +67,7 @@ export default function History() {
               </button>
               <button
                 className={styles.deleteButton}
-                onClick={() => handleDelete(w.id)}
+                onClick={() => setDeletingWorkoutId(w.id)}
               >
                 Delete
               </button>
@@ -91,6 +87,18 @@ export default function History() {
           workout={editingWorkout}
           onClose={() => setShowModal(false)}
           onSave={fetchWorkouts}
+        />
+      )}
+
+      {deletingWorkoutId && (
+        <ConfirmDeleteModal
+          title="Delete Workout"
+          message="Delete this workout? This action cannot be undone."
+          onClose={() => setDeletingWorkoutId(null)}
+          onConfirm={async () => {
+            await api.delete(`/api/workouts/${deletingWorkoutId}`)
+            fetchWorkouts()
+          }}
         />
       )}
     </div>
