@@ -3,6 +3,7 @@ import api from "../services/api"
 import type { Workout, WeeklyPlan, Template, TemplateExercise } from "../types/index"
 import styles from "./Dashboard.module.css"
 import WorkoutModal from '../components/modals/WorkoutModal'
+import DeleteWorkoutModal from '../components/modals/DeleteWorkoutModal'
 import { toLocalDateString } from '../utils/date'
 
 
@@ -13,6 +14,7 @@ export default function Dashboard(){
     const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
     const [todaysPlans, setTodaysPlans] = useState<WeeklyPlan[]>([])
     const [planTemplate, setPlanTemplate] = useState<Template | null>(null)
+    const [deletingWorkoutId, setDeletingWorkoutId] = useState<string | null>(null);
 
     const fetchTodaysPlan = async (): Promise<void> => {
         const res = await api.get<WeeklyPlan[]>('/api/planner/')
@@ -90,13 +92,6 @@ export default function Dashboard(){
         setShowModal(true);
     }
 
-    const handleDelete = async (id: string): Promise<void> => {
-        if(!window.confirm("Delete this workout?")) 
-            return;
-        await api.delete(`/api/workouts/${id}`)
-        fetchWorkouts()
-    }
-    
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -157,7 +152,7 @@ export default function Dashboard(){
                                 <button className={styles.actionButton} onClick={() => openEdit(workout)}>
                                     Edit
                                 </button>
-                                <button className={styles.deleteButton} onClick={() => handleDelete(workout.id)}>
+                                <button className={styles.deleteButton} onClick={() => setDeletingWorkoutId(workout.id)}>
                                     Delete
                                 </button>
                             </div>
@@ -181,6 +176,14 @@ export default function Dashboard(){
                 setPlanTemplate(null)
                 }}
                 onSave={fetchWorkouts}
+            />
+            )}
+
+            {deletingWorkoutId && (
+            <DeleteWorkoutModal
+                workoutId={deletingWorkoutId}
+                onClose={() => setDeletingWorkoutId(null)}
+                onDeleted={fetchWorkouts}
             />
             )}
         </div>
