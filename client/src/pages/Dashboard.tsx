@@ -3,7 +3,7 @@ import api from "../services/api"
 import type { Workout, WeeklyPlan, Template, TemplateExercise } from "../types/index"
 import styles from "./Dashboard.module.css"
 import WorkoutModal from '../components/modals/WorkoutModal'
-import DeleteWorkoutModal from '../components/modals/DeleteWorkoutModal'
+import ConfirmDeleteModal from '../components/modals/ConfirmDeleteModal'
 import { toLocalDateString } from '../utils/date'
 
 
@@ -180,10 +180,14 @@ export default function Dashboard(){
             )}
 
             {deletingWorkoutId && (
-            <DeleteWorkoutModal
-                workoutId={deletingWorkoutId}
+            <ConfirmDeleteModal
+                title="Delete Workout"
+                message="Delete this workout? This action cannot be undone."
                 onClose={() => setDeletingWorkoutId(null)}
-                onDeleted={fetchWorkouts}
+                onConfirm={async () => {
+                    await api.delete(`/api/workouts/${deletingWorkoutId}`)
+                    fetchWorkouts()
+                }}
             />
             )}
         </div>

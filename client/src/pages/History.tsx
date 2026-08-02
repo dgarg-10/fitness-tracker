@@ -3,7 +3,7 @@ import type { ChangeEvent } from 'react'
 import api from '../services/api'
 import type { Workout } from '../types'
 import WorkoutModal from '../components/modals/WorkoutModal'
-import DeleteWorkoutModal from '../components/modals/DeleteWorkoutModal'
+import ConfirmDeleteModal from '../components/modals/ConfirmDeleteModal'
 import styles from './History.module.css'
 
 export default function History() {
@@ -91,10 +91,14 @@ export default function History() {
       )}
 
       {deletingWorkoutId && (
-        <DeleteWorkoutModal
-          workoutId={deletingWorkoutId}
+        <ConfirmDeleteModal
+          title="Delete Workout"
+          message="Delete this workout? This action cannot be undone."
           onClose={() => setDeletingWorkoutId(null)}
-          onDeleted={fetchWorkouts}
+          onConfirm={async () => {
+            await api.delete(`/api/workouts/${deletingWorkoutId}`)
+            fetchWorkouts()
+          }}
         />
       )}
     </div>
