@@ -1,21 +1,25 @@
 import { useState } from 'react'
-import api from '../../services/api'
-import styles from './DeleteWorkoutModal.module.css'
+import styles from './ConfirmDeleteModal.module.css'
 
-interface DeleteWorkoutModalProps {
-  workoutId: string
+interface ConfirmDeleteModalProps {
+  title?: string
+  message: string
   onClose: () => void
-  onDeleted: () => void
+  onConfirm: () => Promise<void>
 }
 
-export default function DeleteWorkoutModal({ workoutId, onClose, onDeleted }: DeleteWorkoutModalProps) {
+export default function ConfirmDeleteModal({
+  title = 'Confirm Delete',
+  message,
+  onClose,
+  onConfirm
+}: ConfirmDeleteModalProps) {
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
   const handleDelete = async (): Promise<void> => {
     setIsDeleting(true)
     try {
-      await api.delete(`/api/workouts/${workoutId}`)
-      onDeleted()
+      await onConfirm()
       onClose()
     } finally {
       setIsDeleting(false)
@@ -25,10 +29,8 @@ export default function DeleteWorkoutModal({ workoutId, onClose, onDeleted }: De
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <h3 className={styles.modalTitle}>Delete Workout</h3>
-        <p className={styles.modalText}>
-          Delete this workout? This action cannot be undone.
-        </p>
+        <h3 className={styles.modalTitle}>{title}</h3>
+        <p className={styles.modalText}>{message}</p>
         <div className={styles.modalActions}>
           <button
             className={styles.cancelButton}
