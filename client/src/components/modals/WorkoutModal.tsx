@@ -83,39 +83,46 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   const [showTemplatePicker, setShowTemplatePicker] = useState<boolean>(false)
   const [showDayPicker, setShowDayPicker] = useState<boolean>(false)
   const [pastWorkouts, setPastWorkouts] = useState<Workout[]>([])
+  const [isInitializing, setIsInitializing] = useState<boolean>(true)
+  const [isSaving, setIsSaving] = useState<boolean>(false)
 
   useEffect(() => {
-    fetchExercises()
-    fetchTemplates()
-    fetchWeeklyPlans()
-
     const init = async (): Promise<void> => {
-      const history = await fetchPastWorkouts()
-      if (workout) {
-        const mapped: ModalExercise[] = workout.workout_exercises
-          .slice()
-          .sort((a, b) => a.order_index - b.order_index)
-          .map((we) => ({
-            id: we.exercises.id,
-            name: we.exercises.name,
-            type: we.exercises.type,
-            muscle_group: we.exercises.muscle_group,
-            sets: toModalSets(we.sets)
-          }))
-        setExercises(mapped)
-      } else if (template) {
-        const mapped: ModalExercise[] = template.template_exercises
-          .slice()
-          .sort((a, b) => a.order_index - b.order_index)
-          .map((te) => ({
-            id: te.exercises.id,
-            name: te.exercises.name,
-            type: te.exercises.type,
-            muscle_group: te.exercises.muscle_group,
-            sets: getLastLoggedSets(te.exercises.id, history)
-          }))
-        setExercises(mapped)
-        setName(template.name)
+      try {
+        const [, , , history] = await Promise.all([
+          fetchExercises(),
+          fetchTemplates(),
+          fetchWeeklyPlans(),
+          fetchPastWorkouts()
+        ])
+        if (workout) {
+          const mapped: ModalExercise[] = workout.workout_exercises
+            .slice()
+            .sort((a, b) => a.order_index - b.order_index)
+            .map((we) => ({
+              id: we.exercises.id,
+              name: we.exercises.name,
+              type: we.exercises.type,
+              muscle_group: we.exercises.muscle_group,
+              sets: toModalSets(we.sets)
+            }))
+          setExercises(mapped)
+        } else if (template) {
+          const mapped: ModalExercise[] = template.template_exercises
+            .slice()
+            .sort((a, b) => a.order_index - b.order_index)
+            .map((te) => ({
+              id: te.exercises.id,
+              name: te.exercises.name,
+              type: te.exercises.type,
+              muscle_group: te.exercises.muscle_group,
+              sets: getLastLoggedSets(te.exercises.id, history)
+            }))
+          setExercises(mapped)
+          setName(template.name)
+        }
+      } finally {
+        setIsInitializing(false)
       }
     }
     init()
@@ -280,14 +287,19 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   }
 
   const handleSave = async (): Promise<void> => {
-    const payload = { name, date, notes, exercises }
-    if (workout) {
-      await api.put(`/api/workouts/${workout.id}`, payload)
-    } else {
-      await api.post('/api/workouts/', payload)
+    setIsSaving(true)
+    try {
+      const payload = { name, date, notes, exercises }
+      if (workout) {
+        await api.put(`/api/workouts/${workout.id}`, payload)
+      } else {
+        await api.post('/api/workouts/', payload)
+      }
+      onSave()
+      onClose()
+    } finally {
+      setIsSaving(false)
     }
-    onSave()
-    onClose()
   }
 
   const plannedDayGroups = DAYS.map((day, i) => ({
@@ -309,6 +321,19 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
         .filter((p) => p.date === date && p.template_id)
         .map((p) => p.template_id as string)
     }))
+
+  if (isInitializing) {
+    return (
+      <div className={styles.overlay}>
+        <div className={styles.modal}>
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner} />
+            <p className={styles.loadingText}>Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.overlay}>
@@ -621,11 +646,19 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
         )}
 
         <div className={styles.modalActions}>
-          <button className={styles.cancelButton} onClick={onClose}>
+          <button
+            className={styles.cancelButton}
+            onClick={onClose}
+            disabled={isSaving}
+          >
             Cancel
           </button>
-          <button className={styles.saveButton} onClick={handleSave}>
-            Save Workout
+          <button
+            className={styles.saveButton}
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? 'Saving...' : 'Save Workout'}
           </button>
         </div>
       </div>
