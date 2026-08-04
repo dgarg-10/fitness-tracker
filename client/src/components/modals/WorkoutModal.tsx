@@ -87,6 +87,8 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   const [isInitializing, setIsInitializing] = useState<boolean>(true)
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [isCreatingExercise, setIsCreatingExercise] = useState<boolean>(false)
+  const [newExerciseError, setNewExerciseError] = useState<string | null>(null)
 
   useEffect(() => {
     const init = async (): Promise<void> => {
@@ -246,12 +248,23 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   }
 
   const createAndAddExercise = async (): Promise<void> => {
-    const res = await api.post<Exercise>('/api/exercises/', newExercise)
-    const created = res.data
-    setAllExercises((prev) => [...prev, created])
-    addExercise(created)
-    setShowNewExerciseForm(false)
-    setNewExercise({ name: '', muscle_group: 'chest', type: 'weighted' })
+    setIsCreatingExercise(true)
+    setNewExerciseError(null)
+    try {
+      const res = await api.post<Exercise>('/api/exercises/', newExercise)
+      const created = res.data
+      setAllExercises((prev) => [...prev, created])
+      addExercise(created)
+      setShowNewExerciseForm(false)
+      setNewExercise({ name: '', muscle_group: 'chest', type: 'weighted' })
+    } catch (err) {
+      const message = isAxiosError<{ error?: string }>(err)
+        ? err.response?.data?.error ?? 'Failed to create exercise. Please try again.'
+        : 'Failed to create exercise. Please try again.'
+      setNewExerciseError(message)
+    } finally {
+      setIsCreatingExercise(false)
+    }
   }
 
   const addSet = (exId: string): void => {
@@ -530,7 +543,10 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
             </div>
             <button
               className={styles.createExerciseButton}
-              onClick={() => setShowNewExerciseForm(true)}
+              onClick={() => {
+                setNewExerciseError(null)
+                setShowNewExerciseForm(true)
+              }}
             >
               + Create new exercise
             </button>
@@ -576,9 +592,13 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
                 <button
                   className={styles.newExerciseAddButton}
                   onClick={createAndAddExercise}
+                  disabled={isCreatingExercise}
                 >
-                  Add
+                  {isCreatingExercise ? 'Adding...' : 'Add'}
                 </button>
+                {newExerciseError && (
+                  <p style={{ color: '#f87171', marginTop: 8 }}>{newExerciseError}</p>
+                )}
               </div>
             )}
           </div>
