@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
+import { isAxiosError } from 'axios'
 import api from '../../services/api'
 import type {
   Workout,
@@ -85,6 +86,7 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
   const [pastWorkouts, setPastWorkouts] = useState<Workout[]>([])
   const [isInitializing, setIsInitializing] = useState<boolean>(true)
   const [isSaving, setIsSaving] = useState<boolean>(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     const init = async (): Promise<void> => {
@@ -288,6 +290,7 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
 
   const handleSave = async (): Promise<void> => {
     setIsSaving(true)
+    setSaveError(null)
     try {
       const payload = { name, date, notes, exercises }
       if (workout) {
@@ -297,6 +300,11 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
       }
       onSave()
       onClose()
+    } catch (err) {
+      const message = isAxiosError<{ error?: string }>(err)
+        ? err.response?.data?.error ?? 'Failed to save workout. Please try again.'
+        : 'Failed to save workout. Please try again.'
+      setSaveError(message)
     } finally {
       setIsSaving(false)
     }
@@ -643,6 +651,10 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
               ))}
             </div>
           </div>
+        )}
+
+        {saveError && (
+          <p style={{ color: '#f87171', marginTop: 8 }}>{saveError}</p>
         )}
 
         <div className={styles.modalActions}>
