@@ -183,17 +183,28 @@ export default function WorkoutModal({ workout, template, onClose, onSave }: Wor
     })
   }
 
+  const appendToName = (namesToAdd: string[]): void => {
+    setName((prev) => {
+      const existing = prev.trim() ? prev.split(',').map((n) => n.trim()) : []
+      const toAppend = namesToAdd.filter((n) => !existing.includes(n))
+      if (toAppend.length === 0) return prev
+      return [...existing, ...toAppend].join(', ')
+    })
+  }
+
   const applyTemplate = (t: Template): void => {
     mergeTemplateExercises([t])
-    if (!name.trim()) setName(t.name)
+    appendToName([t.name])
     setShowTemplatePicker(false)
   }
 
   const applyPlannedTemplateIds = (templateIds: string[]): void => {
-    const matched = templateIds
+    const uniqueIds = Array.from(new Set(templateIds))
+    const matched = uniqueIds
       .map((id) => templates.find((t) => t.id === id))
       .filter((t): t is Template => !!t)
     mergeTemplateExercises(matched)
+    appendToName(matched.map((t) => t.name))
     setShowDayPicker(false)
   }
 
